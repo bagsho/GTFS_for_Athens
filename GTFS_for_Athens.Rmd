@@ -26,6 +26,7 @@ library(hms)
 library(lubridate)
 library(units)
 library(zip)
+library(jsonlite)
 ```
 
 
@@ -50,22 +51,10 @@ In this document, a validated, frequency-based GTFS feed for Athens, Ohio is cre
 
 -   shapes.txt
 
-Because of the assumptions made for the creation of this GTFS file system, some tables have same number of rows. For instances, since there isn't any headway change during the day, trips table and frequencies table have same number of rows, latter showing the headways of the trips they follow all day. Another pair is the stops table and the stop_times table. They have equal number of rows because both of them list the sequence of stops along each trip.
-
-These files have relations based on key variables. Although there have been a lot of variables, four of them are critical.route_id, trip_id, shape_id and stop_id. Since there isn't a specified naming for these id's, they are coded as follows: Routes have their route_id's based on their order of the route table. Trips are named for each direction of the routes. If a route is two-way, then it has two trips, each of both is opposite of each other. Since there are no change in the paths of the routes during the day (at least in this data) shape_id's are same with trip id's. Lastly, the stop_id's are just the stop sequence added trip_id's (shape_id's) since all the stops are in a way route specific. All of these four key variables are some combinations of route, direction and stop sequences. Below there is a table that summarizes them.
-
-| No  | Name     | Contents                                    |
-|-----|----------|---------------------------------------------|
-| 1   | route_id | [route_id]                                  |
-| 2   | trip_id  | [route_id] \_ [direction]                   |
-| 3   | shape_id | [route_id] \_ [direction]                   |
-| 4   | stop_id  | [route_id] \_ [direction] \_ [stopSequence] |
 
 # Import data
 
 ## Current GTFS data format
-
-import
 
 ```{r import current_GTFS, message=FALSE, warning=FALSE}
 current_GTFS <- read_gtfs("data/athens.zip")
@@ -80,45 +69,19 @@ stops<-current_GTFS[["stops"]]
 stop_times %>% left_join(stops,by="stop_id") %>% select(trip=trip_id,seq=stop_sequence,time_a=arrival_time,time_d=departure_time,stop=stop_id,stop_name) %>% View
 ```
 
+## Webpage information
 
-A validation result table shows the files and fields in the GTFS feed and how they compare to the specification. This table not only shows the files and fields in the table, but the whole possible file and fields of a ideal GTFS feed. That way it enables the analyst to identify the current situation better. To investigate all the files in detail, all rows of the table are shown below.
+stops
+```{r}
 
-```{r investigate current_GTFS, message=FALSE, warning=FALSE}
-validation_result <- attr(current_GTFS, "validation_result")
-validation_result
-validation_result %>%
-  group_by(file_spec, file, file_provided_status) %>%
-  summarise(count = n())
-validation_result %>%
-  group_by(file_spec, file_provided_status, field_spec, field_provided_status) %>%
-  summarise(count = n())
+stops_link<-"https://athens.doublemap.com/map/v2/stops"
+trips_link<-"https://athens.doublemap.com/map/v2/trips"
+routes_link<-"https://athens.doublemap.com/map/v2/routes"
+
+web_stops <- fromJSON(stops_link, flatten = TRUE)
+web_trips<-fromJSON(trips_link, flatten = TRUE)
+web_routes<-fromJSON(routes_link, flatten = TRUE)
+
 ```
 
-Since there is not any required file or field is missing, it is concluded that the GTFS file is valid.
-
-A quick look at the comparison of the feed with the specifications.
-
-```{r comp with specs, message=FALSE, warning=FALSE}
-validation_result %>%
-  group_by(file_spec, file, file_provided_status) %>%
-  summarise(count = n()) %>%
-  arrange(desc(file_spec), desc(file_provided_status)) %>%
-  select(file_spec, file_provided_status, file)
-```
-
-A final look at the feed to conclude the section.
-
-```{r comp with specs2, message=FALSE, warning=FALSE}
-validation_result %>%
-  group_by(file_spec, file, file_provided_status) %>%
-  summarise(count = n()) %>%
-  arrange(desc(file_spec), desc(file_provided_status)) %>%
-  select(file_spec, file_provided_status, file) %>%
-  group_by(file_spec, file_provided_status) %>%
-  summarise(count = n()) %>%
-  arrange(desc(file_spec), desc(file_provided_status))
-```
-
-
-There are --- required files in the specifications that are all included in the current GTFS feed. On the other hand, there 11 optional files in the specifications while only --- of them are included in the feed.
 
