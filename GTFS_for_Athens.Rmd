@@ -62,16 +62,22 @@ names(current_GTFS)
 ```
 
 ```{r}
-shapes<-current_GTFS[["shapes"]]
-stop_times<-current_GTFS[["stop_times"]]
-stops<-current_GTFS[["stops"]]
+GTFS_shapes<-current_GTFS[["shapes"]]
+GTFS_stop_times<-current_GTFS[["stop_times"]]
+GTFS_stops<-current_GTFS[["stops"]]
 
-stop_times %>% left_join(stops,by="stop_id") %>% select(trip=trip_id,seq=stop_sequence,time_a=arrival_time,time_d=departure_time,stop=stop_id,stop_name) %>% View
+GTFS_stop_times %>% 
+  left_join(GTFS_stops,by="stop_id") %>% 
+  select(trip=trip_id,
+         seq=stop_sequence,
+         time_a=arrival_time,
+         time_d=departure_time,
+         stop=stop_id,
+         stop_name) %>% View
 ```
 
 ## Webpage information
 
-stops
 ```{r}
 
 stops_link<-"https://athens.doublemap.com/map/v2/stops"
@@ -81,6 +87,8 @@ routes_link<-"https://athens.doublemap.com/map/v2/routes"
 web_stops <- fromJSON(stops_link, flatten = TRUE)
 web_trips<-fromJSON(trips_link, flatten = TRUE)
 web_routes<-fromJSON(routes_link, flatten = TRUE)
+
+rm(stops_link,trips_link,routes_link)
 
 ```
 
