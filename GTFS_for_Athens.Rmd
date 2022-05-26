@@ -107,9 +107,11 @@ route_53<-simple %>%
   bind_cols(simple %>%
               html_nodes("a")%>%
               html_text2() %>%  
-              as_tibble
+              as_tibble()
   ) %>% 
-  set_names("stop_id","stop_name")
+  set_names("stop_id","stop_name")%>% 
+  mutate(stop_seq=row_number()) %>% 
+  relocate(stop_seq)
 
 
 ```
