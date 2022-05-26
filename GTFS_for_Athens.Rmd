@@ -92,4 +92,26 @@ rm(stops_link,trips_link,routes_link)
 
 ```
 
+```{r sample_route_stops}
+
+library(rvest)
+
+text_route_link<-"https://athens.doublemap.com/map/text?route=53"
+simple<-read_html(text_route_link)
+
+route_53<-simple %>%
+  html_nodes("a") %>% 
+  html_attr('href')%>% 
+  as_tibble() %>% 
+  mutate(value=as.integer(str_replace(value,"text\\?stop=",""))) %>% 
+  bind_cols(simple %>%
+              html_nodes("a")%>%
+              html_text2() %>%  
+              as_tibble
+  ) %>% 
+  set_names("stop_id","stop_name")
+
+
+```
+
 
