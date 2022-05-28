@@ -29,11 +29,9 @@ library(zip)
 library(jsonlite)
 ```
 
-
 # Introduction
 
 In this document, a validated, frequency-based GTFS feed for Athens, Ohio is created from the current informal transit network files. The final output GTFS feed includes the following files that have the required fields.
-
 
 -   agency.txt
 
@@ -50,7 +48,6 @@ In this document, a validated, frequency-based GTFS feed for Athens, Ohio is cre
 -   frequencies.txt
 
 -   shapes.txt
-
 
 # Import data
 
@@ -92,7 +89,8 @@ rm(stops_link,trips_link,routes_link)
 
 ```
 
-#create shapes
+# create shapes
+
 ```{r shapes}
 shapes<-web_routes %>%
   select(id, path) %>%
@@ -106,8 +104,8 @@ shapes<-web_routes %>%
   ungroup()
 ```
 
-
 similarity with initial GTFS feed
+
 ```{r}
 source_gtfs_sum <- GTFS_shapes %>%
   group_by(shape_id) %>%
@@ -125,15 +123,35 @@ rm(source_gtfs_sum)
 It is concluded that although these two files are not same, they are very similar. Therefore for the routes whose path information is missing, it is safe to use the data in the initial GTFS feed. The only missing line is Line4 with the route_id 55.
 
 ```{r add missing lines}
-shapes<-shapes %>% 
+final_shapes<-shapes %>% 
   bind_rows(GTFS_shapes %>% 
               mutate(shape_id=as.integer(shape_id)) %>% 
               filter(shape_id==55)
   )
 ```
 
+# create stops
 
+required fields for stops.txt are the following ones.
 
+-   stop_id
+
+-   stop_name
+
+-   stop_lat
+
+-   stop_lon
+
+Since the there are a lot more stops in the web_stops file than the ones in the initial GTFS stop file, the former one is decided to be used.
+
+```{r}
+final_stops<-web_stops %>% 
+  as_tibble() %>% 
+  select(stop_id=id,
+         stop_name=name,
+         stop_lat=lat,
+         stop_lon=lon) %>% head
+```
 
 ```{r sample_route_stops}
 
@@ -162,4 +180,3 @@ route_53<-simple %>%
 ```{r}
 
 ```
-
