@@ -75,7 +75,12 @@ GTFS_stop_times %>%
 
 ## Webpage information
 
-```{r}
+### import web data webpage
+
+The web information was initially imported from web and then saved to a local directory. Then it is imported from that directory. The reason for this is that the web information is not stable and all of the routes are not published together all the time. So the routes were imported when all the routes were published.
+
+The code below is the initial one for importing from web and saving to the local directory. It is not executed but left in this file for future uses or investigations.
+```{r eval=FALSE, include=FALSE}
 
 stops_link<-"https://athens.doublemap.com/map/v2/stops"
 trips_link<-"https://athens.doublemap.com/map/v2/trips"
@@ -85,14 +90,23 @@ web_stops <- fromJSON(stops_link, flatten = TRUE)
 web_trips<-fromJSON(trips_link, flatten = TRUE)
 web_routes<-fromJSON(routes_link, flatten = TRUE)
 
-rm(stops_link,trips_link,routes_link)
+web_data<-list(web_stops=web_stops,web_trips=web_trips,web_routes=web_routes)
+write_rds(web_data,"data/web_data")
 
+rm(stops_link,trips_link,routes_link,web_data,web_stops,web_routes,web_trips)
+```
+
+### import web data from local directory
+```{r}
+web_stops <- read_rds("data/web_data") %>% pluck("web_stops")
+web_trips<-read_rds("data/web_data") %>% pluck("web_trips")
+web_routes<-read_rds("data/web_data") %>% pluck("web_routes")
 ```
 
 # create shapes
 
 ```{r shapes}
-shapes<-web_routes %>%
+final_shapes<-web_routes %>%
   select(id, path) %>%
   as_tibble() %>%
   unnest(cols = path) %>% 
@@ -112,7 +126,7 @@ source_gtfs_sum <- GTFS_shapes %>%
   summarise(count = n()) %>%
   mutate(shape_id = as.integer(shape_id))
 
-shapes %>%
+final_shapes %>%
   group_by(shape_id) %>%
   summarise(count = n()) %>%
   left_join(source_gtfs_sum, by = "shape_id")
@@ -120,16 +134,8 @@ shapes %>%
 rm(source_gtfs_sum)
 ```
 
-After importing web_routes now we have Line4. So the section below is deleted.
-<!-- It is concluded that although these two files are not same, they are very similar. Therefore for the routes whose path information is missing, it is safe to use the data in the initial GTFS feed. The only missing line is Line4 with the route_id 55. -->
 
-```{r add missing lines, eval=FALSE, include=FALSE}
-final_shapes<-shapes %>% 
-  bind_rows(GTFS_shapes %>% 
-              mutate(shape_id=as.integer(shape_id)) %>% 
-              filter(shape_id==55)
-  )
-```
+It is concluded that although these two files are not same, they are very similar. 
 
 # create stops
 
@@ -151,7 +157,7 @@ final_stops<-web_stops %>%
   select(stop_id=id,
          stop_name=name,
          stop_lat=lat,
-         stop_lon=lon) %>% head
+         stop_lon=lon)
 ```
 
 # create routes
