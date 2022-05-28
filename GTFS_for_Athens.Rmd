@@ -120,9 +120,10 @@ shapes %>%
 rm(source_gtfs_sum)
 ```
 
-It is concluded that although these two files are not same, they are very similar. Therefore for the routes whose path information is missing, it is safe to use the data in the initial GTFS feed. The only missing line is Line4 with the route_id 55.
+After importing web_routes now we have Line4. So the section below is deleted.
+<!-- It is concluded that although these two files are not same, they are very similar. Therefore for the routes whose path information is missing, it is safe to use the data in the initial GTFS feed. The only missing line is Line4 with the route_id 55. -->
 
-```{r add missing lines}
+```{r add missing lines, eval=FALSE, include=FALSE}
 final_shapes<-shapes %>% 
   bind_rows(GTFS_shapes %>% 
               mutate(shape_id=as.integer(shape_id)) %>% 
@@ -152,6 +153,37 @@ final_stops<-web_stops %>%
          stop_lat=lat,
          stop_lon=lon) %>% head
 ```
+
+# create routes
+
+the fields that are included in the shapes.txt are the following ones.
+
+-   route_id
+
+-   route_type
+
+-   route_long_name (conditionally)
+
+-   route_short_name (conditionally)
+
+-   route_color (optional)
+
+```{r}
+final_routes<-web_routes %>% 
+  as_tibble() %>% 
+  select(route_id=id,
+         route_long_name=name,
+         route_short_name=short_name,
+         route_color =color
+         ) %>% 
+  mutate(route_type=3L, # for bus mode
+         route_long_name=ifelse(route_id==76,"Line 7n",route_long_name),
+         route_long_name=ifelse(route_id==78,"Line 7a",route_long_name),
+         route_short_name=ifelse(route_id==76,"7n",route_short_name),
+         route_short_name=ifelse(route_id==78,"7a",route_short_name)) 
+```
+
+# other
 
 ```{r sample_route_stops}
 
