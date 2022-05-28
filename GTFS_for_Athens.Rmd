@@ -92,6 +92,38 @@ rm(stops_link,trips_link,routes_link)
 
 ```
 
+create shapes
+```{r shapes}
+shapes<-web_routes %>%
+  select(id, path) %>%
+  as_tibble() %>%
+  unnest(cols = path) %>% 
+  rename(shape_pt_lat = path,shape_id=id) %>%
+  mutate(shape_pt_lon = lead(shape_pt_lat)) %>%
+  filter(shape_pt_lon<0)   %>% 
+  group_by(shape_id) %>%
+  mutate(shape_pt_sequence = row_number()) %>% 
+  ungroup()
+```
+
+
+similarity with initial GTFS feed
+```{r}
+source_gtfs_sum <- GTFS_shapes %>%
+  group_by(shape_id) %>%
+  summarise(count = n()) %>%
+  mutate(shape_id = as.integer(shape_id))
+
+shapes %>%
+  group_by(shape_id) %>%
+  summarise(count = n()) %>%
+  left_join(source_gtfs_sum, by = "shape_id")
+
+rm(source_gtfs_sum)
+```
+
+It is concluded that although these two files are not same, they are very similar. Therefore for the routes whose path information is missing, it is safe to use the data in the initial GTFS feed.
+
 ```{r sample_route_stops}
 
 library(rvest)
@@ -116,4 +148,7 @@ route_53<-simple %>%
 
 ```
 
+```{r}
+
+```
 
