@@ -92,7 +92,7 @@ rm(stops_link,trips_link,routes_link)
 
 ```
 
-create shapes
+#create shapes
 ```{r shapes}
 shapes<-web_routes %>%
   select(id, path) %>%
@@ -102,7 +102,7 @@ shapes<-web_routes %>%
   mutate(shape_pt_lon = lead(shape_pt_lat)) %>%
   filter(shape_pt_lon<0)   %>% 
   group_by(shape_id) %>%
-  mutate(shape_pt_sequence = row_number()) %>% 
+  mutate(shape_pt_sequence = as.integer(row_number()-1)) %>% 
   ungroup()
 ```
 
@@ -122,7 +122,18 @@ shapes %>%
 rm(source_gtfs_sum)
 ```
 
-It is concluded that although these two files are not same, they are very similar. Therefore for the routes whose path information is missing, it is safe to use the data in the initial GTFS feed.
+It is concluded that although these two files are not same, they are very similar. Therefore for the routes whose path information is missing, it is safe to use the data in the initial GTFS feed. The only missing line is Line4 with the route_id 55.
+
+```{r add missing lines}
+shapes<-shapes %>% 
+  bind_rows(GTFS_shapes %>% 
+              mutate(shape_id=as.integer(shape_id)) %>% 
+              filter(shape_id==55)
+  )
+```
+
+
+
 
 ```{r sample_route_stops}
 
