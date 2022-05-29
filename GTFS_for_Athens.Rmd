@@ -77,9 +77,10 @@ GTFS_stop_times %>%
 
 ### import web data webpage
 
-The web information was initially imported from web and then saved to a local directory. Then it is imported from that directory. The reason for this is that the web information is not stable and all of the routes are not published together all the time. So the routes were imported when all the routes were published.
+The web information was initially imported from web and then saved to a local directory. Then it is imported from that directory every time the code is executed. The reason is that the web information is not stable and all of the routes are not published together all the time. So the routes were imported when all the routes were published.
 
 The code below is the initial one for importing from web and saving to the local directory. It is not executed but left in this file for future uses or investigations.
+
 ```{r eval=FALSE, include=FALSE}
 
 stops_link<-"https://athens.doublemap.com/map/v2/stops"
@@ -97,6 +98,7 @@ rm(stops_link,trips_link,routes_link,web_data,web_stops,web_routes,web_trips)
 ```
 
 ### import web data from local directory
+
 ```{r}
 web_stops <- read_rds("data/web_data") %>% pluck("web_stops")
 web_trips<-read_rds("data/web_data") %>% pluck("web_trips")
@@ -134,8 +136,7 @@ final_shapes %>%
 rm(source_gtfs_sum)
 ```
 
-
-It is concluded that although these two files are not same, they are very similar. 
+It is concluded that although these two files are not same, they are very similar.
 
 # create stops
 
@@ -149,7 +150,7 @@ required fields for stops.txt are the following ones.
 
 -   stop_lon
 
-Since the there are a lot more stops in the web_stops file than the ones in the initial GTFS stop file, the former one is decided to be used.
+Since there are a lot more stops in the web_stops file than the ones in the initial GTFS stop file, the former one is decided to be used.
 
 ```{r}
 final_stops<-web_stops %>% 
@@ -189,9 +190,43 @@ final_routes<-web_routes %>%
          route_short_name=ifelse(route_id==78,"7a",route_short_name)) 
 ```
 
+# create stop_times
+
+The stop times will be imported from pdf files so the timetables were initially copied to excel files. However these files are not applicaple directly because the stop names are not same with the stop database. Therefore there should be an initial check before using those timetable data.
+
+-   trip_id
+
+-   arrival_time
+
+-   departure_time
+
+-   stop_id
+
+-   stop_sequence
+
+```{r create input table for timetables}
+timetable_input_table<-web_routes %>%
+  select(route_id=id, stop_id=stops) %>%
+  as_tibble() %>%
+  unnest(cols = stop_id) %>% 
+  group_by(route_id) %>%
+  mutate(stop_sequence = as.integer(row_number()-1)) %>% 
+  ungroup() %>% 
+  left_join(final_stops,by="stop_id") %>% 
+  select(-stop_lat,-stop_lon) %>% 
+  left_join(final_routes,by="route_id") %>% 
+  select(route_id,route_long_name,stop_sequence,stop_id,stop_name) 
+
+openxlsx::write.xlsx(timetable_input_table,file="data/timetable_input_table.xlsx")
+
+
+```
+
 # other
 
-```{r sample_route_stops}
+this one is not executed.
+
+```{r sample_route_stops, eval=FALSE, include=FALSE}
 
 library(rvest)
 
