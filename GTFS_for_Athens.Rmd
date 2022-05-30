@@ -204,7 +204,9 @@ The stop times will be imported from pdf files so the timetables were initially 
 
 -   stop_sequence
 
-```{r create input table for timetables}
+## create input table for timetables
+
+```{r create input table for timetables, eval=FALSE, include=FALSE}
 timetable_input_table<-web_routes %>%
   select(route_id=id, stop_id=stops) %>%
   as_tibble() %>%
@@ -222,6 +224,23 @@ openxlsx::write.xlsx(timetable_input_table,file="data/timetable_input_table.xlsx
 
 ```
 
+there are some edits on the files while manupulating the stop_times table
+
+```{r add Clark station}
+final_stops<-final_stops %>% add_row(stop_id=182, stop_name="Clarke", stop_lat=39.33556,stop_lon=-82.11262) %>% arrange(desc(stop_id))
+```
+
+## import the timetable table
+
+```{r}
+library(readxl)
+timetable_output_table <- read_excel("data/timetable_output_table.xlsx", 
+    col_types = c("numeric", "text", "numeric", 
+        "numeric", "text", "numeric", "numeric", 
+        "skip", "skip"))
+```
+
+## create arrival times as s
 # other
 
 this one is not executed.
