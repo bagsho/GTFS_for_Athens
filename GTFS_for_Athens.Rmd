@@ -224,7 +224,7 @@ openxlsx::write.xlsx(timetable_input_table,file="data/timetable_input_table.xlsx
 
 ```
 
-there are some edits on the files while manupulating the stop_times table
+there are some edits on the files while manipulating the stop_times table
 
 ```{r add Clark station}
 final_stops<-final_stops %>% add_row(stop_id=182, stop_name="Clarke", stop_lat=39.33556,stop_lon=-82.11262) %>% arrange(desc(stop_id))
@@ -240,7 +240,33 @@ timetable_output_table <- read_excel("data/timetable_output_table.xlsx",
         "skip", "skip"))
 ```
 
-## create arrival times as s
+## create final_stop_times
+
+```{r create final_stop_times}
+final_stop_times<-timetable_output_table %>%
+  mutate(duration_arr = ifelse(stop_sequence != 0, arrival_time - lag(arrival_time), 0)) %>%
+  mutate(duration_arr = ifelse(duration_arr < 0, duration_arr + 60, duration_arr)) %>%
+  mutate(duration_dep = ifelse(stop_sequence != 0, departure_time - lag(departure_time), 0)) %>%
+  mutate(duration_dep = ifelse(duration_dep < 0, duration_dep + 60, duration_dep)) %>%
+  group_by(route_id) %>%
+  mutate(
+    arrival_time_new = round(cumsum(duration_arr), 0),
+    departure_time_new = round(cumsum(duration_dep), 0)
+  ) %>%
+  mutate(
+    arrival_time_new = hms::hms(seconds_to_period(arrival_time_new)),
+    departure_time_new = hms::hms(seconds_to_period(departure_time_new))
+  ) %>%
+  select(
+    trip_id = route_id,
+    stop_sequence,
+    stop_id,
+    arrival_time = arrival_time_new,
+    departure_time = departure_time_new
+  )
+
+```
+
 # other
 
 this one is not executed.
