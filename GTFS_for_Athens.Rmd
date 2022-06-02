@@ -27,6 +27,7 @@ library(lubridate)
 library(units)
 library(zip)
 library(jsonlite)
+source("functions.R")
 ```
 
 # Introduction
@@ -273,6 +274,16 @@ final_stop_times<-timetable_output_table %>%
   )
 
 ```
+
+# create frequencies
+
+Since there are too many records to add to the frequency table and the code will be too dense and harder to read, it is decided to put this code as a function in a separate R script along with similar functions. They are then called at the top of this document.
+
+```{r add_frequency_records}
+final_frequencies2<-sample_GTFS %>% add_frequency_records()
+ 
+```
+
 
 # other
 
