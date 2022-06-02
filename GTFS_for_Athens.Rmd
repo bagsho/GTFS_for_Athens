@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r libraries, message=FALSE, warning=FALSE}
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
 library(tidyverse)
 library(tidytransit)
 library(printr)
@@ -51,6 +51,13 @@ In this document, a validated, frequency-based GTFS feed for Athens, Ohio is cre
 
 # Import data
 
+## Sample GTFS data format
+
+```{r import sample_GTFS, message=FALSE, warning=FALSE}
+sample_GTFS <- read_gtfs("data/sample-feed.zip")
+names(sample_GTFS)
+```
+
 ## Current GTFS data format
 
 ```{r import current_GTFS, message=FALSE, warning=FALSE}
@@ -73,11 +80,11 @@ GTFS_stop_times %>%
          stop_name) %>% View
 ```
 
-## Webpage information
+## Transit data from athens.doublemap.com
 
-### import web data webpage
+### import data from webpage
 
-The web information was initially imported from web and then saved to a local directory. Then it is imported from that directory every time the code is executed. The reason is that the web information is not stable and all of the routes are not published together all the time. So the routes were imported when all the routes were published.
+The web information was initially imported from web and then saved to a local directory. Then it is imported from that directory every time the code is executed. The reason for adopting such a process is that the web information is not stable and all of the routes are not published together all the time. So the routes were imported when all the routes were published.
 
 The code below is the initial one for importing from web and saving to the local directory. It is not executed but left in this file for future uses or investigations.
 
@@ -254,8 +261,8 @@ final_stop_times<-timetable_output_table %>%
     departure_time_new = round(cumsum(duration_dep), 0)
   ) %>%
   mutate(
-    arrival_time_new = hms::hms(seconds_to_period(arrival_time_new)),
-    departure_time_new = hms::hms(seconds_to_period(departure_time_new))
+    arrival_time_new = hms::hms(seconds_to_period(arrival_time_new*60)),
+    departure_time_new = hms::hms(seconds_to_period(departure_time_new*60))
   ) %>%
   select(
     trip_id = route_id,
