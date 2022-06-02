@@ -284,6 +284,38 @@ final_frequencies<-sample_GTFS %>% add_frequency_records()
 final_frequencies
 ```
 
+# create calendar
+
+```{r calendar}
+final_calendar<-sample_GTFS %>%
+    pluck("calendar") %>%
+    slice(0) %>%
+  add_row(service_id="MonFri",
+          monday=1,
+          tuesday=1,
+          wednesday=1,
+          thursday=1,
+          friday=1,
+          saturday=0,
+          sunday=0,
+          start_date=ymd(20220101),
+          end_date=ymd(20251231)  
+  ) %>% 
+    add_row(service_id="MonSat",
+          monday=1,
+          tuesday=1,
+          wednesday=1,
+          thursday=1,
+          friday=1,
+          saturday=1,
+          sunday=0,
+          start_date=ymd(20220101),
+          end_date=ymd(20251231)   
+  ) 
+final_calendar
+  
+```
+
 
 # other
 
