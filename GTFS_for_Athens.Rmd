@@ -27,6 +27,7 @@ library(lubridate)
 library(units)
 library(zip)
 library(jsonlite)
+library(readxl)
 source("functions.R")
 ```
 
@@ -239,7 +240,6 @@ final_stops<-final_stops %>% add_row(stop_id=182, stop_name="Clarke", stop_lat=3
 ## import the timetable table
 
 ```{r}
-library(readxl)
 timetable_output_table <- read_excel("data/timetable_output_table.xlsx", 
     col_types = c("numeric", "text", "numeric", 
         "numeric", "text", "numeric", "numeric", 
@@ -269,8 +269,10 @@ final_stop_times<-timetable_output_table %>%
     stop_id,
     arrival_time = arrival_time_new,
     departure_time = departure_time_new
-  )
+  ) %>% 
+  ungroup()
 
+final_stop_times %>% head()
 ```
 
 # create frequencies
@@ -279,6 +281,7 @@ Since there are too many records to add to the frequency table and the code will
 
 ```{r add_frequency_records}
 final_frequencies<-sample_GTFS %>% add_frequency_records()
+final_frequencies
 ```
 
 
