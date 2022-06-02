@@ -56,14 +56,12 @@ In this document, a validated, frequency-based GTFS feed for Athens, Ohio is cre
 
 ```{r import sample_GTFS, message=FALSE, warning=FALSE}
 sample_GTFS <- read_gtfs("data/sample-feed.zip")
-names(sample_GTFS)
 ```
 
 ## Current GTFS data format
 
 ```{r import current_GTFS, message=FALSE, warning=FALSE}
 current_GTFS <- read_gtfs("data/athens.zip")
-names(current_GTFS)
 ```
 
 ```{r}
@@ -248,7 +246,7 @@ timetable_output_table <- read_excel("data/timetable_output_table.xlsx",
         "skip", "skip"))
 ```
 
-## create final_stop_times
+## create final table
 
 ```{r create final_stop_times}
 final_stop_times<-timetable_output_table %>%
@@ -280,8 +278,7 @@ final_stop_times<-timetable_output_table %>%
 Since there are too many records to add to the frequency table and the code will be too dense and harder to read, it is decided to put this code as a function in a separate R script along with similar functions. They are then called at the top of this document.
 
 ```{r add_frequency_records}
-final_frequencies2<-sample_GTFS %>% add_frequency_records()
- 
+final_frequencies<-sample_GTFS %>% add_frequency_records()
 ```
 
 
