@@ -1,0 +1,77 @@
+---
+title: "Validation of the final GTFS feed for Athens"
+author: "Orhan Aktas"
+date: '2022-06-03'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  class.source = "bg-warning text-warning"
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytransit)
+library(kableExtra)
+```
+
+# Introduction
+
+In this document the output GTFS feed and its sub files are validated against GTFS specifications.
+
+# Validation
+
+## Import
+
+```{r import final GTFS feed, message=FALSE, warning=FALSE}
+output_GTFS <- read_gtfs("data/gtfs_20220603.zip")
+summary(output_GTFS)
+```
+
+First of all, since it can be imported with TidyTransit's read_gtfs function, it can be said that the feed is valid in general. Some feeds can't be even read by this function. In fact, in the first version of this feed, it couldn't be read by the function. After finding the incompatible columns and fixing it, the feed became readable.
+
+## validatation table
+
+A validation result table shows the files and fields in the GTFS feed and how they compare to the specification. This table not only shows the files and fields in the table, but the whole possible file and fields of a ideal GTFS feed. That way it enables the analyst to identify the current situation better. To investigate all the files in detail, all rows of the table are shown below.
+
+```{r show the Whole table, echo=TRUE, message=FALSE, warning=FALSE}
+validation_result <- attr(output_GTFS, "validation_result")
+validation_result %>% 
+  kbl()
+```
+
+Then it is checked whether there is a missing required file
+
+```{r analysis1, message=FALSE, warning=FALSE}
+validation_result %>% 
+  group_by(file_spec,file_provided_status) %>% 
+  summarise(count=n()) %>% 
+  kbl()
+```
+
+There isn't any required file that is missing. Then it is checked whether there is missing required fields in the files. The required fields in optional files that are not included in this GTFS feed are filtered out.
+
+```{r analysis2, echo=TRUE, message=FALSE, warning=FALSE}
+validation_result %>%
+    filter(file_provided_status == "TRUE") %>%
+    filter(field_spec!="ext") %>%  # exclude one field which is undocumented however the output already has it. This is shape_dist field in shapes file.
+    filter(field_spec=="req") %>% 
+    group_by(file_spec, field_spec) %>%
+    summarise(
+      number_of_fields = n(), 
+      number_of_TRUEs=sum(field_provided_status, na.rm = TRUE)
+      ) %>% 
+    kbl()
+```
+
+
+All of the 29 fields in the required files and all of the 8 fields in the optional files that this GTFS feed has are provided.
+
+## Conclusion
+
+To sum up, the output GTFS feed is validated from different aspects. First of all, it can be imported without problem with TidyTransit's read_GTFS function which gives errors while trying to read invalid GTFS feeds. Also, it is showed that there isn't any missing required file. Lastly, it is also showed that there isn't any missing required fields in the files that are included in the GTFS feed. Based on these aspects, it is concluded that this GTFS feed is valid.

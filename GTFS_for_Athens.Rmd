@@ -112,6 +112,50 @@ web_trips<-read_rds("data/web_data") %>% pluck("web_trips")
 web_routes<-read_rds("data/web_data") %>% pluck("web_routes")
 ```
 
+# create agency
+
+```{r}
+final_agency<-sample_GTFS %>%
+    pluck("agency") %>%
+    slice(0) %>% add_row(agency_id="APT",
+                         agency_name="Athens Public Transit",
+                         agency_url="https://hapcap.org/transportation/athens-public-transit/",
+                         agency_timezone="US/Eastern")
+final_agency
+```
+
+# create calendar
+
+```{r calendar}
+final_calendar<-sample_GTFS %>%
+    pluck("calendar") %>%
+    slice(0) %>%
+  add_row(service_id="MonFri",
+          monday=1,
+          tuesday=1,
+          wednesday=1,
+          thursday=1,
+          friday=1,
+          saturday=0,
+          sunday=0,
+          start_date=ymd(20220101),
+          end_date=ymd(20251231)  
+  ) %>% 
+    add_row(service_id="MonSat",
+          monday=1,
+          tuesday=1,
+          wednesday=1,
+          thursday=1,
+          friday=1,
+          saturday=1,
+          sunday=0,
+          start_date=ymd(20220101),
+          end_date=ymd(20251231)   
+  ) 
+final_calendar
+  
+```
+
 # create shapes
 
 ```{r shapes}
@@ -198,6 +242,8 @@ final_routes<-web_routes %>%
          route_short_name=ifelse(route_id==76,"7n",route_short_name),
          route_short_name=ifelse(route_id==78,"7a",route_short_name)) 
 
+final_routes<-final_routes %>% bind_cols(tibble(x=c("L2","L3","L4","L5","L6","L7n","L7a"))) %>% mutate(route_id=x) %>% select(-x)
+
 final_routes
 ```
 
@@ -245,12 +291,22 @@ final_stops<-final_stops %>% add_row(stop_id=182, stop_name="Clarke", stop_lat=3
 
 ```{r}
 timetable_output_table <- read_excel("data/timetable_output_table.xlsx", 
-    col_types = c("numeric", "text", "numeric", 
+    col_types = c("text", "text", "numeric", 
         "numeric", "text", "numeric", "numeric", 
         "skip", "skip"))
 ```
 
 ## create final table
+
+```{r}
+temp_route_trip_key<-final_routes %>%
+  select(route_id) %>%
+  expand_grid(select(final_calendar,service_id)) %>%
+  mutate(trip_id = paste(route_id, "_", service_id, sep = "")) %>%
+  select(-service_id) 
+
+```
+
 
 ```{r create final_stop_times}
 final_stop_times<-timetable_output_table %>%
@@ -268,15 +324,19 @@ final_stop_times<-timetable_output_table %>%
     departure_time_new = hms::hms(seconds_to_period(departure_time_new*60))
   ) %>%
   select(
-    trip_id = route_id,
+    route_id,
     stop_sequence,
     stop_id,
     arrival_time = arrival_time_new,
     departure_time = departure_time_new
   ) %>% 
-  ungroup()
+  ungroup() %>%
+  left_join(temp_route_trip_key, by = "route_id") %>%
+  arrange(trip_id, stop_sequence) %>%
+  select(-route_id) %>%
+  relocate(trip_id)
 
-rm(timetable_output_table)
+rm(timetable_output_table,temp_route_trip_key)
 
 final_stop_times %>% head()
 ```
@@ -290,49 +350,7 @@ final_frequencies<-sample_GTFS %>% add_frequency_records()
 final_frequencies
 ```
 
-# create calendar
 
-```{r calendar}
-final_calendar<-sample_GTFS %>%
-    pluck("calendar") %>%
-    slice(0) %>%
-  add_row(service_id="MonFri",
-          monday=1,
-          tuesday=1,
-          wednesday=1,
-          thursday=1,
-          friday=1,
-          saturday=0,
-          sunday=0,
-          start_date=ymd(20220101),
-          end_date=ymd(20251231)  
-  ) %>% 
-    add_row(service_id="MonSat",
-          monday=1,
-          tuesday=1,
-          wednesday=1,
-          thursday=1,
-          friday=1,
-          saturday=1,
-          sunday=0,
-          start_date=ymd(20220101),
-          end_date=ymd(20251231)   
-  ) 
-final_calendar
-  
-```
-
-# create agency
-
-```{r}
-final_agency<-sample_GTFS %>%
-    pluck("agency") %>%
-    slice(0) %>% add_row(agency_id="APT",
-                         agency_name="Athens Public Transit",
-                         agency_url="https://hapcap.org/transportation/athens-public-transit/",
-                         agency_timezone="US/Eastern")
-final_agency
-```
 
 # create trips
 
