@@ -166,6 +166,8 @@ final_stops<-web_stops %>%
          stop_name=name,
          stop_lat=lat,
          stop_lon=lon)
+
+final_stops %>% head()
 ```
 
 # create routes
@@ -195,6 +197,8 @@ final_routes<-web_routes %>%
          route_long_name=ifelse(route_id==78,"Line 7a",route_long_name),
          route_short_name=ifelse(route_id==76,"7n",route_short_name),
          route_short_name=ifelse(route_id==78,"7a",route_short_name)) 
+
+final_routes
 ```
 
 # create stop_times
@@ -343,6 +347,23 @@ final_trips<-sample_GTFS %>%
 rm(temp_records)
 
 final_trips %>% head()
+```
+
+# Exporting GTFS files
+
+write files
+
+```{r final export, message=FALSE, warning=FALSE}
+
+write_csv(final_agency,"data/gtfs_20220603/agency.txt")
+write_csv(final_calendar,"data/gtfs_20220603/calendar.txt")
+write_csv(final_routes,"data/gtfs_20220603/routes.txt")
+write_csv(final_shapes,"data/gtfs_20220603/shapes.txt")
+write_csv(final_frequencies,"data/gtfs_20220603/frequencies.txt")
+write_csv(final_stops,"data/gtfs_20220603/stops.txt")
+write_csv(final_stop_times,"data/gtfs_20220603/stop_times.txt")
+write_csv(final_trips,"data/gtfs_20220603/trips.txt")
+
 ```
 
 ```{r}

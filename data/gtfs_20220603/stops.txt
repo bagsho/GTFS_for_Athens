@@ -1,0 +1,171 @@
+stop_id,stop_name,stop_lat,stop_lon
+182,Clarke,39.33556,-82.11262
+180,W State St,39.333335,-82.111763
+179,Andover Rd,39.296824,-82.113443
+178,Richland/West Green Southbound,39.323376,-82.104478
+177,Factory St/Union,39.329385,-82.108437
+176,Central Food Parking Lot,39.326812,-82.109746
+175,"Ridges, child development Center",39.31926,-82.111097
+174,Congress & W State,39.331144,-82.102482
+173,Broney & Masonic Lodge,39.332339,-82.101506
+172,W State & Court,39.330851,-82.100913
+171,Washington/Court,39.329335,-82.101049
+170,President/Court,39.326523,-82.101324
+169,Mulberry/Baker,39.325468,-82.101978
+168,Mulberry/Main Hub,39.325368,-82.101963
+167,Ohio Health Center,39.464649,-82.250648
+166,Mary Hill Health Center,39.463173,-82.243162
+165,West Washington/Canal,39.46165,-82.240891
+164,West Washington/Nelsonville Library,39.461003,-82.233847
+163,Nelsonville Square,39.460474,-82.232111
+162,Rocky Boot Way,39.458765,-82.232094
+161,Burger King/E Canal St,39.443402,-82.211735
+160,Hocking College,39.442886,-82.222272
+159,Suds Monkey,39.24341,-82.186613
+158,Alexander Schools,39.241608,-82.186992
+157,Ayers Road,39.235553,-82.190727
+156,Reynolds/Blizzard Lane,39.232492,-82.194676
+155,E Clinton/Reynolds,39.228838,-82.194933
+154,McCoy/E Clinton St,39.226785,-82.197829
+153,State Street/McCoy Ave,39.223943,-82.199031
+152,Washington Rd/State St,39.22666,-82.204138
+151,Close to Home,39.224387,-82.205994
+150,Albany Old School,39.225937,-82.206033
+149,Marathon Albany,39.235328,-82.195716
+148,Lake Snowden,39.240364,-82.190512
+147,United Lane/Fruth,39.290813,-82.127512
+146,Park/University Terrace,39.324875,-82.099143
+143,Morris & Grant,39.333153,-82.090005
+142,S Green Drive - Ping Eastbound,39.322011,-82.098695
+141,Richland South Y,39.304376,-82.103244
+140,Methodist Church/Parking garage Temp,39.329177,-82.099704
+139,University Courtyard,39.315142,-82.102246
+138,Alumni Gateway,39.327439,-82.100315
+134,Gordy Hall,39.324886,-82.099274
+133,Ridges - Mail Room,39.319471,-82.109971
+132,Shafer & Moore Ave,39.329061,-82.110771
+131,Central Food Building Westbound,39.32692,-82.110738
+128,West Green Drive - Stocker Center,39.325679,-82.107536
+127,Shafer/ West Green Drive eastbound,39.326812,-82.11106
+125,Fairgrounds,39.330148,-82.114134
+124,Haning Hall - Uptown,39.327426,-82.103019
+123,S Green Drive - Ping Westbound,39.32217,-82.098659
+122,E State Kroger - Streetside,39.336819,-82.069071
+121,E State Athens Mall - Streetside,39.337094,-82.07265
+120,E State Community Center Streetside,39.337454,-82.07679
+119,Richland & Canterbury,39.309866,-82.104242
+118,South Richland,39.306226,-82.103674
+117,Richland South Y,39.304672,-82.103185
+116,Berkley Turnaround,39.295665,-82.11205
+115,South Richland,39.306209,-82.103772
+114,Carpenter & Mound St,39.332424,-82.103706
+113,Lancaster & Second St,39.336048,-82.10463
+112,Columbus Rd & Sunset Dr,39.33952,-82.103889
+111,Columbus Rd - Acenet,39.348867,-82.095697
+109,North Columbus Rd,39.352371,-82.098511
+108,Columbus Rd & Dorr Rd,39.354316,-82.100633
+107,Columbus Rd - HRS,39.357151,-82.103718
+106,JFS County Home,39.393316,-82.120356
+105,Chauncey Elementary,39.399014,-82.124336
+104,Chauncey Post Office,39.3992,-82.127769
+103,Rutland Home Furnishings,39.384411,-82.136719
+102,682 & Poston Rd,39.378109,-82.135101
+101,682 & Poston Rd,39.378548,-82.135437
+100,Plains Library,39.36816,-82.131866
+99,W Union & Bikeway,39.33112,-82.123245
+98,W Union & Herrold,39.330933,-82.120125
+97,W Union - Fairgrounds,39.329884,-82.114258
+96,Second & Central,39.336739,-82.111404
+95,Clark St - Sheltering Arms,39.335594,-82.112106
+94,W Union & Shafer,39.32967,-82.110565
+93,W Union & Factory St,39.329521,-82.108246
+92,W Union - Beasley Mill,39.328346,-82.104149
+91,foo,39.334862,-82.097351
+89,Casa Cantina,39.330772,-82.10144
+88,Alpha Xi Delta,39.328634,-82.099795
+87,Top of Jeff Hill,39.327314,-82.098792
+86,The Summit At Coates Run,39.314793,-82.107224
+85,W Union - Beasley Mill,39.328724,-82.104797
+84,W Union & Factory St,39.329365,-82.107765
+83,Shafer & W Union,39.329777,-82.110771
+82,Central Ave & W State,39.333442,-82.111695
+81,Innovation Center,39.334534,-82.114799
+80,W Union - Fairgrounds,39.329777,-82.114609
+79,O'Bleness Hospital,39.327351,-82.113876
+78,W Union & Herrold,39.330597,-82.119675
+77,W Union & Bikeway,39.331005,-82.122978
+76,U. Estates Boulevard,39.335358,-82.130348
+75,E 4th St - Hickory Creek,39.361214,-82.123711
+74,Plains Library,39.368099,-82.132042
+73,Connett & Bean Rd,39.370476,-82.141968
+72,Plains Plaza Mall,39.37405,-82.135498
+71,Columbus Rd - HRS,39.357445,-82.103745
+70,Columbus Rd & Dorr Rd,39.354259,-82.100357
+69,North Columbus Rd,39.352589,-82.098549
+68,Columbus Rd - Acenet,39.348152,-82.095314
+67,Columbus Rd & Sunset Dr,39.339378,-82.103821
+66,Lancaster & Second St,39.336086,-82.104485
+65,Carpenter & Mound St,39.332569,-82.10379
+64,Andover Road,39.297565,-82.113808
+63,Race St - Morton Hall,39.323608,-82.097549
+62,Stewart St - Front Four,39.325779,-82.095467
+61,Stewart & E Union,39.327621,-82.095276
+60,Mill & Stewart,39.329548,-82.095161
+59,Stimson & Palmer,39.332363,-82.0952
+58,Campbell & Stimson,39.332451,-82.092199
+57,S May & Morris,39.333123,-82.088433
+56,Lincoln & S May,39.335227,-82.088197
+55,Home St & Lincoln,39.335125,-82.084778
+54,Lincoln & Home St,39.335007,-82.08474
+53,S May & Lincoln,39.335136,-82.088218
+52,Morris & S May,39.333044,-82.088417
+51,Stimson & Campbell,39.332359,-82.092256
+50,Palmer & Stimson,39.332237,-82.095253
+49,Stewart & Mill St,39.329483,-82.095009
+48,Stewart & E Union,39.327484,-82.095192
+47,Stewart St - Front Four,39.325294,-82.095459
+46,Race St - Morton Hall,39.323563,-82.097931
+45,Richland & Dairy Lane,39.31744,-82.105843
+44,Richland & Courtyard,39.31551,-82.105034
+43,Richland & Hooper,39.31271,-82.103569
+42,Richland & Canterbury,39.309931,-82.104387
+41,Carriage Hill Drive,39.31179,-82.10717
+40,Richland & Hooper,39.313297,-82.103867
+39,Richland & Summit,39.315685,-82.105278
+38,Richland & West Green Dr Northbound,39.323994,-82.104158
+37,Ridges - Kennedy Museum,39.320533,-82.109064
+36,Dairy Lane & S Park,39.318253,-82.111588
+35,Richland & Dairy Lane,39.317655,-82.106087
+33,Richland & President St,39.326791,-82.102933
+32,Congress & Washington,39.32909,-82.102676
+31,Congress & W State St,39.331097,-82.102501
+30,Carpenter & Court St,39.33234,-82.101586
+29,E State & Morris Ave,39.333721,-82.097137
+28,E State & Watt St,39.337456,-82.092506
+27,E State & May Ave,39.337479,-82.087837
+26,E State & Harris,39.337502,-82.084877
+25,E State & Charles St,39.337635,-82.076454
+24,E State & Eden Place,39.337341,-82.073013
+23,E State @ Big Lots,39.337074,-82.06955
+22,E State & Robinson,39.336708,-82.0653
+21,E State/Sleep Outfitters,39.336338,-82.060921
+20,Market on State,39.336788,-82.056953
+19,E State & Hope Drive,39.334415,-82.043434
+18,Holzer Clinic,39.333817,-82.028
+17,E State & Hope Drive,39.334293,-82.043449
+16,Farmers Market,39.335941,-82.055298
+15,Sleep Outfitters,39.336095,-82.060650999999993
+14,Walmart,39.335285,-82.066246
+13,Kroger,39.336998,-82.070146
+12,Athens Mall,39.336967,-82.070831
+11,Community Center,39.337401,-82.075796
+10,E State & Home St,39.337383,-82.084793
+9,E State/May Ave,39.337372,-82.088226
+8,E State & Watt St,39.337353,-82.092094
+7,E State & Morris Ave,39.333462,-82.097115
+6,Carpenter & Grosvenor St,39.332146,-82.100121
+5,Court & W State St,39.33102,-82.100945
+4,Court & Washington,39.32935,-82.101105
+3,Court & President St,39.326458,-82.101372
+2,President & Court St,39.326599,-82.101578
+1,Mulberry @ Baker Center,39.325428,-82.101967

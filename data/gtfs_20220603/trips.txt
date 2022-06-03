@@ -1,0 +1,15 @@
+trip_id,route_id,service_id
+L2_MonFri,L2,MonFri
+L2_MonSat,L2,MonSat
+L3_MonFri,L3,MonFri
+L3_MonSat,L3,MonSat
+L4_MonFri,L4,MonFri
+L4_MonSat,L4,MonSat
+L5_MonFri,L5,MonFri
+L5_MonSat,L5,MonSat
+L6_MonFri,L6,MonFri
+L6_MonSat,L6,MonSat
+L7a_MonFri,L7a,MonFri
+L7a_MonSat,L7a,MonSat
+L7n_MonFri,L7n,MonFri
+L7n_MonSat,L7n,MonSat

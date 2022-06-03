@@ -1,0 +1,8 @@
+route_id,route_long_name,route_short_name,route_color,route_type
+53,APT Line 2,2,FF0000,3
+54,APT Line 3,3,FFD826,3
+55,APT Line 4,4,896ADA,3
+56,APT Line 5,5,316DDE,3
+57,APT Line 6,6,57C1FF,3
+76,Line 7n,7n,19FF7D,3
+78,Line 7a,7a,19FF7D,3
