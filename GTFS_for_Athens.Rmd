@@ -228,7 +228,7 @@ timetable_input_table<-web_routes %>%
 
 openxlsx::write.xlsx(timetable_input_table,file="data/timetable_input_table.xlsx")
 
-
+rm(timetable_input_table)
 ```
 
 there are some edits on the files while manipulating the stop_times table
@@ -271,6 +271,8 @@ final_stop_times<-timetable_output_table %>%
     departure_time = departure_time_new
   ) %>% 
   ungroup()
+
+rm(timetable_output_table)
 
 final_stop_times %>% head()
 ```
@@ -325,36 +327,22 @@ final_agency<-sample_GTFS %>%
                          agency_name="Athens Public Transit",
                          agency_url="https://hapcap.org/transportation/athens-public-transit/",
                          agency_timezone="US/Eastern")
+final_agency
 ```
 
+# create trips
 
+```{r}
+temp_records<-final_frequencies %>% group_by(trip_id) %>% summarise(count=n()) %>% select(trip_id) %>% mutate(trip_id2=trip_id) %>% separate(trip_id2,sep="_",into = c("route_id","service_id"))
 
-# other
+final_trips<-sample_GTFS %>%
+    pluck("trips") %>%
+    slice(0) %>% 
+    select(trip_id,route_id,service_id) %>% bind_rows(temp_records)
 
-this one is not executed.
+rm(temp_records)
 
-```{r sample_route_stops, eval=FALSE, include=FALSE}
-
-library(rvest)
-
-text_route_link<-"https://athens.doublemap.com/map/text?route=53"
-simple<-read_html(text_route_link)
-
-route_53<-simple %>%
-  html_nodes("a") %>% 
-  html_attr('href')%>% 
-  as_tibble() %>% 
-  mutate(value=as.integer(str_replace(value,"text\\?stop=",""))) %>% 
-  bind_cols(simple %>%
-              html_nodes("a")%>%
-              html_text2() %>%  
-              as_tibble()
-  ) %>% 
-  set_names("stop_id","stop_name")%>% 
-  mutate(stop_seq=row_number()) %>% 
-  relocate(stop_seq)
-
-
+final_trips %>% head()
 ```
 
 ```{r}
