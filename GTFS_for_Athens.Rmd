@@ -316,6 +316,18 @@ final_calendar
   
 ```
 
+# create agency
+
+```{r}
+final_agency<-sample_GTFS %>%
+    pluck("agency") %>%
+    slice(0) %>% add_row(agency_id="APT",
+                         agency_name="Athens Public Transit",
+                         agency_url="https://hapcap.org/transportation/athens-public-transit/",
+                         agency_timezone="US/Eastern")
+```
+
+
 
 # other
 
