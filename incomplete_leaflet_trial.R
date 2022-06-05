@@ -4,12 +4,12 @@ leaflet() %>%
   addProviderTiles(providers$CartoDB.Positron) %>%
   addPolylines(
     lng=final_shapes %>% 
-      filter(shape_id==78) %>% 
+      filter(shape_id==54) %>% 
       select(shape_pt_lon) %>%      
       unlist() %>% 
       as.numeric(),
     lat=final_shapes %>% 
-      filter(shape_id==78) %>%
+      filter(shape_id==54) %>%
       select(shape_pt_lat) %>%      
       unlist() %>% 
       as.numeric(),
@@ -19,13 +19,13 @@ leaflet() %>%
   addCircleMarkers(
     lng=final_stop_times %>% 
       left_join(final_stops,by="stop_id") %>% 
-      filter(trip_id=="L7a_MonFri") %>%
+      filter(trip_id=="L3_MonFri_Start") %>%
       select(stop_lon) %>% 
       unlist() %>% 
       as.numeric(),
     lat=final_stop_times %>% 
       left_join(final_stops,by="stop_id") %>% 
-      filter(trip_id=="L7a_MonFri") %>% 
+      filter(trip_id=="L3_MonFri_Start") %>% 
       select(stop_lat) %>%
       unlist() %>% 
       as.numeric(),
@@ -77,6 +77,55 @@ plot_routes_with_stops = function(shape_trip_table,final_shapes, final_stop_time
   
 }
 
+
+# morning trips
+leaflet() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addPolylines(
+    lng=final_shapes %>% 
+      filter(shape_id==54) %>% 
+      select(shape_pt_lon) %>%      
+      unlist() %>% 
+      as.numeric(),
+    lat=final_shapes %>% 
+      filter(shape_id==54) %>%
+      select(shape_pt_lat) %>%      
+      unlist() %>% 
+      as.numeric(),
+    color = "green",
+    weight = 2, 
+    opacity = 0.2) %>% 
+  addPolylines(
+    lng=final_stop_times %>% 
+      left_join(final_stops,by="stop_id") %>% 
+      filter(trip_id=="L3_MonFri_Start") %>%
+      select(stop_lon) %>% 
+      unlist() %>% 
+      as.numeric(),
+    lat=final_stop_times %>% 
+      left_join(final_stops,by="stop_id") %>% 
+      filter(trip_id=="L3_MonFri_Start") %>% 
+      select(stop_lat) %>%
+      unlist() %>% 
+      as.numeric(),
+    color = "red",
+    weight = 2, 
+    opacity = 0.6) %>% 
+  addCircleMarkers(
+    lng=final_stop_times %>% 
+      left_join(final_stops,by="stop_id") %>% 
+      filter(trip_id=="L3_MonFri_Start") %>%
+      select(stop_lon) %>% 
+      unlist() %>% 
+      as.numeric(),
+    lat=final_stop_times %>% 
+      left_join(final_stops,by="stop_id") %>% 
+      filter(trip_id=="L3_MonFri_Start") %>% 
+      select(stop_lat) %>%
+      unlist() %>% 
+      as.numeric(),
+    color="black",
+    radius =1)
 
 
 

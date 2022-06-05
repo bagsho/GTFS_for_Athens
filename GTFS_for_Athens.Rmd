@@ -345,25 +345,6 @@ rm(timetable_output_table,temp_route_trip_key)
 final_stop_times %>% head()
 ```
 
-## add morning routes
-
-```{r}
-morning_trips <- read_excel("data/timetable_output_table.xlsx",
-  sheet = "morning",
-  col_types = c(
-    "text", "text", "numeric",
-    "numeric", "text", "date", "date"
-  )
-) %>%
-  mutate(arrival_time = as_hms(arrival_time)) %>%
-  mutate(departure_time = as_hms(departure_time)) %>%
-  select(trip_id, stop_sequence, stop_id, arrival_time, departure_time)
-
-final_stop_times<-final_stop_times %>% bind_rows(morning_trips)
-
-rm(morning_trips)
-```
-
 # create frequencies
 
 Since there are too many records to add to the frequency table and the code will be too dense and harder to read, it is decided to put this code as a function in a separate R script along with similar functions. They are then called at the top of this document.
@@ -373,8 +354,6 @@ final_frequencies<-sample_GTFS %>% add_frequency_records()
 
 final_frequencies
 ```
-
-
 
 # create trips
 
@@ -392,12 +371,6 @@ final_trips <- sample_GTFS %>%
   select(trip_id, route_id, service_id) %>%
   bind_rows(temp_records) %>%
 
-  # add morning trips
-  add_row(trip_id = "L3_MonFri_Start", route_id = "L3", service_id = "MonFri") %>%
-  add_row(trip_id = "L5_MonFri_Start", route_id = "L5", service_id = "MonFri") %>%
-  add_row(trip_id = "L6_MonFri_Start", route_id = "L6", service_id = "MonFri") %>%
-  arrange(trip_id) %>%
-
   # add shape_id
   mutate(shape_id = recode(
     route_id,
@@ -408,19 +381,81 @@ final_trips <- sample_GTFS %>%
     "L6" = 57,
     "L7a" = 78,
     "L7n" = 76
-  )) %>%
-  mutate(shape_id = ifelse(
-    str_sub(final_trips$trip_id, start = -5) == "Start",
-    NA,
-    shape_id
-  ))
-
-
+  )) 
 
 rm(temp_records)
 
 final_trips %>% head()
 ```
+
+
+# Adding morning routes
+
+After investigating the current files, it is decided to change the logic of the trips in the morning for a couple of lines. The reason for this is emanating from the fact that first buses in some lines are visiting the stops on their way to its morning starting point stops. The stop order information that were scraped from webpage is providing those stops as first stops of all the trips of day. However, in fact a better approach which is adopted here is to create separate trip information for first trips and group others based on their service types. In this section, all the required changes to make this transformation are implemented. 
+
+to stop_times file
+```{r}
+morning_trips <- read_excel("data/timetable_output_table.xlsx",
+  sheet = "morning",
+  col_types = c(
+    "text", "text", "numeric",
+    "numeric", "text", "date", "date"
+  )
+) %>%
+  mutate(arrival_time = as_hms(arrival_time)) %>%
+  mutate(departure_time = as_hms(departure_time)) %>%
+  select(trip_id, stop_sequence, stop_id, arrival_time, departure_time)
+
+final_stop_times<-final_stop_times %>% bind_rows(morning_trips)
+
+rm(morning_trips)
+```
+
+to trips file
+```{r}
+final_trips<-final_trips %>%
+  add_row(trip_id = "L3_MonFri_Start", route_id = "L3", service_id = "MonFri") %>%
+  add_row(trip_id = "L5_MonFri_Start", route_id = "L5", service_id = "MonFri") %>%
+  add_row(trip_id = "L6_MonFri_Start", route_id = "L6", service_id = "MonFri") %>%
+  arrange(trip_id) %>%
+  mutate(shape_id =
+      ifelse(str_sub(trip_id, start = -5) == "Start", NA, shape_id)
+  ) %>%
+  mutate(shape_id = case_when(
+    trip_id=="L3_MonFri_Start" ~ 101,
+    trip_id=="L5_MonFri_Start" ~ 102,
+    trip_id=="L6_MonFri_Start" ~ 103,
+    TRUE ~ shape_id
+  )) 
+```
+
+to shapes file
+```{r}
+morning_shapes<-final_stop_times %>%
+  filter(str_sub(trip_id, start = -5) == "Start") %>%
+  select(trip_id, stop_sequence, stop_id) %>%
+  left_join(final_stops, by = "stop_id") %>%
+  select(-stop_id, -stop_name) %>%
+  mutate(shape_id = recode(
+    trip_id,
+    L3_MonFri_Start = 101,
+    L5_MonFri_Start = 102,
+    L6_MonFri_Start = 103
+  )) %>% 
+  select(
+    shape_id,
+    shape_pt_lat=stop_lat,
+    shape_pt_lon=stop_lon,
+    shape_pt_sequence=stop_sequence
+  ) 
+
+final_shapes<-final_shapes %>% bind_rows(morning_shapes)
+
+rm (morning_shapes)
+
+```
+
+
 
 # Exporting GTFS files
 
