@@ -345,6 +345,30 @@ rm(timetable_output_table,temp_route_trip_key)
 final_stop_times %>% head()
 ```
 
+## add morning routes
+
+```{r}
+morning_trips <- read_excel("data/timetable_output_table.xlsx",
+  sheet = "morning",
+  col_types = c(
+    "text", "text", "numeric",
+    "numeric", "text", "date", "date"
+  )
+) %>%
+  mutate(arrival_time = as_hms(arrival_time)) %>%
+  mutate(departure_time = as_hms(departure_time)) %>%
+  select(trip_id, stop_sequence, stop_id, arrival_time, departure_time)
+
+final_stop_times<-final_stop_times %>% bind_rows(morning_trips)
+
+
+final_trips <- final_trips %>%
+  add_row(trip_id = "L3_MonFri_Start", route_id = "L3", service_id = "MonFri") %>%
+  add_row(trip_id = "L5_MonFri_Start", route_id = "L5", service_id = "MonFri") %>%
+  add_row(trip_id = "L6_MonFri_Start", route_id = "L6", service_id = "MonFri") %>%
+  arrange(trip_id)
+```
+
 # create frequencies
 
 Since there are too many records to add to the frequency table and the code will be too dense and harder to read, it is decided to put this code as a function in a separate R script along with similar functions. They are then called at the top of this document.

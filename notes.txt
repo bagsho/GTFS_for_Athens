@@ -1,1 +1,3 @@
 routes are designed as loop routes because although these are loop in actual world, the first and last stop have different id's probably because they are on the different sides of the roads. I don't want to change the id of the last stop with the id of the first stop and I prefer to leave them as standart routes. 
+
+since fares for one-way trips and transfers are free, the required transfers at the last stops (for instances a passenger boards at two stops before the last stop and wants to get off at 3rd stop) are neglectable.
