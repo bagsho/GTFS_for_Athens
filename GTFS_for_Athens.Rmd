@@ -388,6 +388,10 @@ write_csv(final_trips,"data/gtfs_20220603/trips.txt")
 
 ```
 
+
+
 ```{r}
 
+
 ```
+

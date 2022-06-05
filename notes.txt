@@ -1,0 +1,1 @@
+routes are designed as loop routes because although these are loop in actual world, the first and last stop have different id's probably because they are on the different sides of the roads. I don't want to change the id of the last stop with the id of the first stop and I prefer to leave them as standart routes. 
