@@ -1,7 +1,7 @@
 ---
 title: "Validation of the final GTFS feed for Athens"
 author: "Orhan Aktas"
-date: '2022-06-03'
+date: '2022-06-05'
 output: html_document
 ---
 
@@ -33,7 +33,7 @@ output_GTFS <- read_gtfs("data/gtfs_20220603.zip")
 summary(output_GTFS)
 ```
 
-First of all, since it can be imported with TidyTransit's read_gtfs function, it can be said that the feed is valid in general. Some feeds can't be even read by this function. In fact, in the first version of this feed, it couldn't be read by the function. After finding the incompatible columns and fixing it, the feed became readable.
+First of all, since it can be imported with TidyTransit's read_gtfs function, it can be said that the feed is valid in general. 
 
 ## validatation table
 

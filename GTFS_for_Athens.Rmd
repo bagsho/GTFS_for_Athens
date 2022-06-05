@@ -1,11 +1,12 @@
 ---
 title: "GTFS Creation for Athens"
 author: "Orhan Aktas"
-date: '2022-03-06'
+date: '2022-05-06'
 output:   
     html_document:
       toc: yes
       number_sections: yes
+      toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
@@ -51,11 +52,15 @@ In this document, a validated, frequency-based GTFS feed for Athens, Ohio is cre
 
 ## Sample GTFS data format
 
+This feed is a collection of sample data files that are published by Google.
+
 ```{r import sample_GTFS, message=FALSE, warning=FALSE}
 sample_GTFS <- read_gtfs("data/sample-feed.zip")
 ```
 
 ## Current GTFS data format
+
+This feed was provided at the beginning of the project.
 
 ```{r import current_GTFS, message=FALSE, warning=FALSE}
 current_GTFS <- read_gtfs("data/athens.zip")
@@ -66,14 +71,6 @@ GTFS_shapes<-current_GTFS[["shapes"]]
 GTFS_stop_times<-current_GTFS[["stop_times"]]
 GTFS_stops<-current_GTFS[["stops"]]
 
-GTFS_stop_times %>% 
-  left_join(GTFS_stops,by="stop_id") %>% 
-  select(trip=trip_id,
-         seq=stop_sequence,
-         time_a=arrival_time,
-         time_d=departure_time,
-         stop=stop_id,
-         stop_name) %>% View
 ```
 
 ## Transit data from athens.doublemap.com
@@ -108,7 +105,9 @@ web_trips<-read_rds("data/web_data") %>% pluck("web_trips")
 web_routes<-read_rds("data/web_data") %>% pluck("web_routes")
 ```
 
-# create agency
+# Create GTFS feed
+
+## create agency
 
 ```{r}
 final_agency<-sample_GTFS %>%
@@ -120,7 +119,7 @@ final_agency<-sample_GTFS %>%
 final_agency
 ```
 
-# create calendar
+## create calendar
 
 ```{r calendar}
 final_calendar<-sample_GTFS %>%
@@ -160,7 +159,7 @@ final_calendar
   
 ```
 
-# create shapes
+## create shapes
 
 ```{r shapes}
 final_shapes<-web_routes %>%
@@ -173,27 +172,11 @@ final_shapes<-web_routes %>%
   group_by(shape_id) %>%
   mutate(shape_pt_sequence = as.integer(row_number()-1)) %>% 
   ungroup()
+
+final_shapes %>% head()
 ```
 
-similarity with initial GTFS feed
-
-```{r}
-source_gtfs_sum <- GTFS_shapes %>%
-  group_by(shape_id) %>%
-  summarise(count = n()) %>%
-  mutate(shape_id = as.integer(shape_id))
-
-final_shapes %>%
-  group_by(shape_id) %>%
-  summarise(count = n()) %>%
-  left_join(source_gtfs_sum, by = "shape_id")
-
-rm(source_gtfs_sum)
-```
-
-It is concluded that although these two files are not same, they are very similar.
-
-# create stops
+## create stops
 
 required fields for stops.txt are the following ones.
 
@@ -204,8 +187,6 @@ required fields for stops.txt are the following ones.
 -   stop_lat
 
 -   stop_lon
-
-Since there are a lot more stops in the web_stops file than the ones in the initial GTFS stop file, the former one is decided to be used.
 
 ```{r}
 final_stops<-web_stops %>% 
@@ -218,7 +199,7 @@ final_stops<-web_stops %>%
 final_stops %>% head()
 ```
 
-# create routes
+## create routes
 
 the fields that are included in the shapes.txt are the following ones.
 
@@ -251,9 +232,9 @@ final_routes<-final_routes %>% bind_cols(tibble(x=c("L2","L3","L4","L5","L6","L7
 final_routes
 ```
 
-# create stop_times
+## create stop_times
 
-The stop times will be imported from pdf files so the timetables were initially copied to excel files. However these files are not applicaple directly because the stop names are not same with the stop database. Therefore there should be an initial check before using those timetable data.
+Since the stop times information is in the pdf files, the timetables were initially transferred to an excel file manually. However these files are not applicable directly because the stop names are not same with the stop database. Therefore an initial manual check was done before using those timetable data. The fields that are included in the stop_times.txt are the following ones.
 
 -   trip_id
 
@@ -265,9 +246,11 @@ The stop times will be imported from pdf files so the timetables were initially 
 
 -   stop_sequence
 
-## create input table for timetables
+### create input table for timetables
 
-```{r create input table for timetables, eval=FALSE, include=FALSE}
+The code below was used to create the timetable file that was later filled manually in Excel environment. It is not executed but left in this file for future uses or investigations.
+
+```{r create input table for timetables, eval=FALSE,echo=TRUE}
 timetable_input_table<-web_routes %>%
   select(route_id=id, stop_id=stops) %>%
   as_tibble() %>%
@@ -285,13 +268,13 @@ openxlsx::write.xlsx(timetable_input_table,file="data/timetable_input_table.xlsx
 rm(timetable_input_table)
 ```
 
-there are some edits on the files while manipulating the stop_times table
+It was found out that some edits are required on the files while creating the stop_times table
 
 ```{r add Clark station}
 final_stops<-final_stops %>% add_row(stop_id=182, stop_name="Clarke", stop_lat=39.33556,stop_lon=-82.11262) %>% arrange(desc(stop_id))
 ```
 
-## import the timetable table
+### import the timetable table
 
 ```{r}
 timetable_output_table <- read_excel("data/timetable_output_table.xlsx", 
@@ -300,7 +283,7 @@ timetable_output_table <- read_excel("data/timetable_output_table.xlsx",
         "skip", "skip"))
 ```
 
-## create final table
+### create final table
 
 ```{r}
 temp_route_trip_key<-final_routes %>%
@@ -310,7 +293,6 @@ temp_route_trip_key<-final_routes %>%
   select(-service_id) 
 
 ```
-
 
 ```{r create final_stop_times}
 final_stop_times<-timetable_output_table %>%
@@ -345,9 +327,14 @@ rm(timetable_output_table,temp_route_trip_key)
 final_stop_times %>% head()
 ```
 
-# create frequencies
+## create frequencies
 
-Since there are too many records to add to the frequency table and the code will be too dense and harder to read, it is decided to put this code as a function in a separate R script along with similar functions. They are then called at the top of this document.
+Since there are too many records to add to the frequency table and the code will be too dense and harder to read, it is decided to put this code as a function in a separate R script along with similar functions. They are then called at the top of this document. The fields that are included in the frequencies.txt are the following ones.
+
+-   trip_id
+-   start_time
+-   end_time
+-   headway_secs
 
 ```{r add_frequency_records}
 final_frequencies<-sample_GTFS %>% add_frequency_records()
@@ -355,7 +342,14 @@ final_frequencies<-sample_GTFS %>% add_frequency_records()
 final_frequencies
 ```
 
-# create trips
+## create trips
+
+The fields that are included in the trips.txt are the following ones.
+
+-   trip_id
+-   route_id
+-   service_id
+-   shape_id
 
 ```{r}
 temp_records <- final_frequencies %>%
@@ -388,12 +382,12 @@ rm(temp_records)
 final_trips %>% head()
 ```
 
+## adding morning routes
 
-# Adding morning routes
-
-After investigating the current files, it is decided to change the logic of the trips in the morning for a couple of lines. The reason for this is emanating from the fact that first buses in some lines are visiting the stops on their way to its morning starting point stops. The stop order information that were scraped from webpage is providing those stops as first stops of all the trips of day. However, in fact a better approach which is adopted here is to create separate trip information for first trips and group others based on their service types. In this section, all the required changes to make this transformation are implemented. 
+After investigating the current files, it is decided to change the logic of the trips in the morning for a couple of lines. The reason for this is emanating from the fact that first buses in some lines are visiting the stops on their way to its morning starting point stops. The stop order information that were scraped from webpage is providing those stops as first stops of all the trips of day. However, in fact a better approach which is adopted here is to create separate trip information for first trips and group others based on their service types. In this section, all the required changes to make this transformation are implemented.
 
 to stop_times file
+
 ```{r}
 morning_trips <- read_excel("data/timetable_output_table.xlsx",
   sheet = "morning",
@@ -412,6 +406,7 @@ rm(morning_trips)
 ```
 
 to trips file
+
 ```{r}
 final_trips<-final_trips %>%
   add_row(trip_id = "L3_MonFri_Start", route_id = "L3", service_id = "MonFri") %>%
@@ -430,6 +425,7 @@ final_trips<-final_trips %>%
 ```
 
 to shapes file
+
 ```{r}
 morning_shapes<-final_stop_times %>%
   filter(str_sub(trip_id, start = -5) == "Start") %>%
@@ -455,9 +451,7 @@ rm (morning_shapes)
 
 ```
 
-
-
-# Exporting GTFS files
+# Export GTFS files
 
 write files
 
@@ -474,10 +468,7 @@ write_csv(final_trips,"data/gtfs_20220603/trips.txt")
 
 ```
 
-
-
 ```{r}
 
 
 ```
-
