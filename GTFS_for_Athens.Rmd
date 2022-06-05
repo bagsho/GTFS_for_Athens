@@ -361,12 +361,7 @@ morning_trips <- read_excel("data/timetable_output_table.xlsx",
 
 final_stop_times<-final_stop_times %>% bind_rows(morning_trips)
 
-
-final_trips <- final_trips %>%
-  add_row(trip_id = "L3_MonFri_Start", route_id = "L3", service_id = "MonFri") %>%
-  add_row(trip_id = "L5_MonFri_Start", route_id = "L5", service_id = "MonFri") %>%
-  add_row(trip_id = "L6_MonFri_Start", route_id = "L6", service_id = "MonFri") %>%
-  arrange(trip_id)
+rm(morning_trips)
 ```
 
 # create frequencies
@@ -375,6 +370,7 @@ Since there are too many records to add to the frequency table and the code will
 
 ```{r add_frequency_records}
 final_frequencies<-sample_GTFS %>% add_frequency_records()
+
 final_frequencies
 ```
 
@@ -383,12 +379,43 @@ final_frequencies
 # create trips
 
 ```{r}
-temp_records<-final_frequencies %>% group_by(trip_id) %>% summarise(count=n()) %>% select(trip_id) %>% mutate(trip_id2=trip_id) %>% separate(trip_id2,sep="_",into = c("route_id","service_id"))
+temp_records <- final_frequencies %>%
+  group_by(trip_id) %>%
+  summarise(count = n()) %>%
+  select(trip_id) %>%
+  mutate(trip_id2 = trip_id) %>%
+  separate(trip_id2, sep = "_", into = c("route_id", "service_id"))
 
-final_trips<-sample_GTFS %>%
-    pluck("trips") %>%
-    slice(0) %>% 
-    select(trip_id,route_id,service_id) %>% bind_rows(temp_records)
+final_trips <- sample_GTFS %>%
+  pluck("trips") %>%
+  slice(0) %>%
+  select(trip_id, route_id, service_id) %>%
+  bind_rows(temp_records) %>%
+
+  # add morning trips
+  add_row(trip_id = "L3_MonFri_Start", route_id = "L3", service_id = "MonFri") %>%
+  add_row(trip_id = "L5_MonFri_Start", route_id = "L5", service_id = "MonFri") %>%
+  add_row(trip_id = "L6_MonFri_Start", route_id = "L6", service_id = "MonFri") %>%
+  arrange(trip_id) %>%
+
+  # add shape_id
+  mutate(shape_id = recode(
+    route_id,
+    "L2" = 53,
+    "L3" = 54,
+    "L4" = 55,
+    "L5" = 56,
+    "L6" = 57,
+    "L7a" = 78,
+    "L7n" = 76
+  )) %>%
+  mutate(shape_id = ifelse(
+    str_sub(final_trips$trip_id, start = -5) == "Start",
+    NA,
+    shape_id
+  ))
+
+
 
 rm(temp_records)
 

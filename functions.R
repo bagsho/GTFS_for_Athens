@@ -1,4 +1,4 @@
-add_frequency_records = function(sample_GTFS, date, observation, graph_title) {
+add_frequency_records = function(sample_GTFS) {
   
   sample_GTFS %>%
     pluck("frequencies") %>%
