@@ -6,3 +6,6 @@ L5,APT Line 5,5,316DDE,3
 L6,APT Line 6,6,57C1FF,3
 L7n,Line 7n,7n,19FF7D,3
 L7a,Line 7a,7a,19FF7D,3
+LSum,Summit Loop,SUM,11705A,3
+LCY,Courtyard Loop,CY,B8FF5C,3
+LSOWL,OWL Summit,SOWL,0FFFFF,3

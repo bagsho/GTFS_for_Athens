@@ -1,7 +1,7 @@
 ---
 title: "Validation of the final GTFS feed for Athens"
 author: "Orhan Aktas"
-date: '2022-06-05'
+date: '2022-07-10'
 output: html_document
 ---
 
@@ -29,7 +29,7 @@ In this document the output GTFS feed and its sub files are validated against GT
 ## Import
 
 ```{r import final GTFS feed, message=FALSE, warning=FALSE}
-output_GTFS <- read_gtfs("data/gtfs_20220603.zip")
+output_GTFS <- read_gtfs("data/gtfs_20220710.zip")
 summary(output_GTFS)
 ```
 

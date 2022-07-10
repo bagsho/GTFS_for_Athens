@@ -387,7 +387,7 @@ final_trips %>% head()
 
 After investigating the current files, it is decided to change the logic of the trips in the morning for a couple of lines. The reason for this is emanating from the fact that the first buses in some lines are visiting the stops on their way to their morning starting point stops. The stop order information that were scraped from the webpage is providing those stops as the first stops of all the trips of the day. However, in fact a better approach which is adopted here is to create separate trip information for first trips and group others based on their service types. In this section, all the required changes to make this transformation are implemented.
 
-### to the stop_times file {.unlisted .unnumbered}
+### to stop_times file {.unlisted}
 
 ```{r}
 morning_trips <- read_excel("data/timetable_output_table.xlsx",
@@ -406,7 +406,7 @@ final_stop_times<-final_stop_times %>% bind_rows(morning_trips)
 rm(morning_trips)
 ```
 
-### to the trips file {.unlisted .unnumbered}
+### to trips file {.unlisted}
 
 ```{r}
 final_trips<-final_trips %>%
@@ -425,7 +425,7 @@ final_trips<-final_trips %>%
   )) 
 ```
 
-### to the shapes file {.unlisted .unnumbered}
+### to shapes file {.unlisted}
 
 ```{r}
 morning_shapes<-final_stop_times %>%
@@ -460,29 +460,7 @@ This section summarizes the efforts for adding three additional lines into the G
 -   Courtyard Loop
 -   OWL Summit
 
-### to the calendar file {.unlisted .unnumbered}
-
-Since the Weekend Night Owl Loop line runs on only Fridays and Saturdays, an additional service_id is needed in calendar file.
-
-```{r}
-final_calendar<-final_calendar %>%
-
-    add_row(service_id="FriSat",
-          monday=0,
-          tuesday=0,
-          wednesday=0,
-          thursday=0,
-          friday=1,
-          saturday=1,
-          sunday=0,
-          start_date=as.double(20220101),
-          end_date=as.double(20251231) 
-    ) 
-
-final_calendar
-```
-
-### to the routes file {.unlisted .unnumbered}
+### to routes file {.unlisted}
 
 ```{r}
 final_routes<-final_routes %>% 
@@ -504,81 +482,7 @@ add_row(route_id="LSOWL",
         route_color ="0FFFFF",
         route_type=3L
          ) 
-final_routes
-```
 
-### to the shapes file {.unlisted .unnumbered}
-The shapes of the lines are taken from the feed that was provided at the beginning of the project.
-```{r}
-additional_shapes<-
-  current_GTFS[["shapes"]] %>% 
-  filter(shape_id %in% c("58","60","88")) %>% 
-  mutate(shape_id=as.integer(shape_id))
-
-final_shapes<-final_shapes %>% bind_rows(additional_shapes)
-
-final_shapes %>% count(shape_id) %>% print
-```
-
-### to the frequencies file {.unlisted .unnumbered}
-
-The Weekend Night Owl Loop line whose trips are coded under `LSOWL_FriSat`, has trips after the midnight. The `end_time` variable for this trip_id is entered as `26:10:10`. This is the official advice from Google transit reference page.^[1](https://developers.google.com/transit/gtfs/reference#frequenciestxt:~:text=trip%20schedule%20begins.-,Example,-%3A%2014%3A30)^
-
-```{r}
-final_frequencies <- final_frequencies%>% 
-  add_row(trip_id="LSum_MonFri",
-          start_time=parse_hms("07:10:00"),
-          end_time=parse_hms("11:00:00"),
-          headway_secs =600
-  )%>% 
-  add_row(trip_id="LSum_MonFri",
-          start_time=parse_hms("11:10:00"),
-          end_time=parse_hms("21:10:00"),
-          headway_secs =1200
-  )%>% 
-  add_row(trip_id="LCY_MonFri",
-          start_time=parse_hms("08:30:00"),
-          end_time=parse_hms("12:30:00"),
-          headway_secs =1800
-  )%>% 
-  add_row(trip_id="LSOWL_FriSat",
-          start_time=parse_hms("21:30:00"),
-          end_time=parse_hms("24:00:00")+7800,
-          headway_secs =1200
-  ) 
-
-final_frequencies%>% tail(4)
-```
-
-### to the trips file {.unlisted .unnumbered}
-
-```{r}
-final_trips<-final_trips %>%
-  add_row(trip_id = "LSum_MonFri", route_id = "LSum", service_id = "MonFri",shape_id=58) %>%
-  add_row(trip_id = "LCY_MonFri", route_id = "LCY", service_id = "MonFri",shape_id=60) %>%
-  add_row(trip_id = "LSOWL_FriSat", route_id = "LSOWL", service_id = "FriSat",shape_id=88)
-
-final_trips %>% tail(3)
-```
-
-
-### to the stop_times file {.unlisted .unnumbered}
-
-```{r}
-
-additional_lines_stop_times <- read_excel(
-  "data/additional_lines_stop_times.xlsx",
-  col_types = c("text", "numeric", "numeric", "date", "date")
-) %>% mutate(
-  arrival_time = hms::as_hms(arrival_time),
-  departure_time = hms::as_hms(departure_time)
-)
-
-final_stop_times<-final_stop_times %>% 
-  bind_rows(additional_lines_stop_times)
-
-final_stop_times %>% 
-  filter(trip_id %in% c("LCY_MonFri","LSOWL_FriSat","LSum_MonFri")) 
 ```
 
 # Export GTFS files

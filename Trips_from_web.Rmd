@@ -1,0 +1,58 @@
+---
+title: "Trips table that is published on athens.doublemap.com"
+author: "Orhan Aktas"
+date: '2022-07-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  class.source = "bg-warning text-warning"
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytransit)
+library(jsonlite)
+library(printr)
+```
+
+# Introduction
+
+This document summarizes the quick analysis of the trips table that is published on the webpage. After realizing that the information retrieved from the web contains only two routes, the trips tables that were created previously in two different timepoints are examined again. 
+
+# Main Work
+## The routes that created from the webpage during investigation 
+```{r}
+trips_link<-"https://athens.doublemap.com/map/v2/trips"
+web_trips_now<-fromJSON(trips_link, flatten = TRUE)
+
+routes_now<-web_trips_now %>%
+  pluck("data", "routes") %>% 
+  select(id,name,display_name)
+
+routes_now
+```
+
+## The routes that previously created from the webpage during the project
+```{r}
+web_trips_old<-read_rds("data/web_data") %>% pluck("web_trips")
+routes_old<-web_trips_old %>%
+  pluck("data", "routes") %>% 
+  select(id,name,display_name)
+routes_old
+```
+
+## The routes in the trips table of the gtfs feed that was provided at the beginning of the project.
+```{r}
+current_GTFS <- read_gtfs("data/athens.zip")
+current_GTFS[["trips"]] %>% count(route_id) %>% select(route_id) %>% print
+```
+
+## Conclusion
+
+To sum up, the routes that the trips information published in the webpage are investigated at three different timepoint. Before the project, during the project and just before preparation of this report. In all of the queries, the trips table includes only two routes. Route id 54 and 55. Based on these aspects, it is concluded that the trips that are published in the webpage are only for a subset of whole lines and they are very incomplete. 

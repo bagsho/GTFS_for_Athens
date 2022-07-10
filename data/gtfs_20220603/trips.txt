@@ -16,3 +16,6 @@ L7a_MonFri,L7a,MonFri,78
 L7a_MonSat,L7a,MonSat,78
 L7n_MonFri,L7n,MonFri,76
 L7n_MonSat,L7n,MonSat,76
+LSum_MonFri,LSum,MonFri,58
+LCY_MonFri,LCY,MonFri,60
+LSOWL_FriSat,LSOWL,FriSat,88
