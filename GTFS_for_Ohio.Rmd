@@ -27,6 +27,8 @@ library(hms)
 library(lubridate)
 library(readxl)
 source("functions.R")
+library(rvest)
+library(tidygeocoder)
 ```
 
 # Introduction
@@ -50,4 +52,98 @@ In this document, a validated, frequency-based GTFS feed for Athens, Ohio is cre
 -   shapes.txt
 
 # Import data
+
+## Import stops
+### Scrape stops from web, create coordinates and save as local file
+
+scrape stops
+```{r eval=FALSE}
+
+# stops link
+html <- read_html("https://ridegobus.com/stops/")
+
+# get stop names
+stop_names <- html %>%
+                html_elements(".column-3 a") %>%
+                html_text2() %>%
+                as_tibble() %>% 
+                set_names("stop")
+
+# get stop links
+stop_links <- paste0(
+                "https://ridegobus.com",
+                html %>%
+                  html_elements(".column-3 a") %>%
+                  html_attr("href") %>%
+                  as.character()
+              )
+
+
+
+```
+
+create function to get stop addresses
+```{r eval=FALSE}
+
+get_address <- function(stop_link) {
+            address<-read_html(stop_link)%>% 
+            html_element(".col-xs-12 :nth-child(1) .col-10 , .col-xs-12 :nth-child(1) strong") %>%     
+            html_text2() %>% 
+            str_extract_all("(?<=\n).+(?=\n)") %>% 
+            pluck(1)
+            
+            return(address)
+}
+
+```
+
+get stop addresses
+```{r eval=FALSE}
+
+stop_addresses<-stop_links %>%  
+                  map(get_address) %>% 
+                  unlist() %>% 
+                  as_tibble() %>% 
+                  set_names("address") %>% 
+                  bind_cols(stop_names) %>% 
+                  relocate(stop)
+```
+
+save stop address tables
+```{r eval=FALSE}
+stop_addresses %>% saveRDS("data/ohio/stop_addresses.RDS")
+rm(stop_addresses,stop_names,stop_links)
+```
+
+add stop coordinates from open street map with geocode function from tidygeocoder package
+```{r eval=FALSE}
+stop_addresses <- readRDS("data/ohio/stop_addresses.RDS")
+
+stop_addresses %>%
+  geocode(address, method = 'osm', lat = latitude , long = longitude)%>%
+  saveRDS("data/ohio/lat_longs_missing.RDS")
+```
+
+completing missing stops
+```{r eval=FALSE}
+
+# read lat_longs table that has missing coordinates
+lat_longs_missing <- readRDS("data/ohio/lat_longs_missing.RDS")
+
+# import missing stops that were previously created manually.
+missing_stops <- read_excel("data/ohio/missing_stops.xlsx")
+
+# fill the empty missing values from missing stops table
+lat_longs <- lat_longs_missing %>%
+  left_join(missing_stops, by = "stop") %>%
+  mutate(
+    latitude = if_else(is.na(latitude), lat, latitude), 
+    longitude = if_else(is.na(longitude), lon, longitude)
+  ) %>%
+  select(-lat, -lon)
+
+# save lat_longs which has no missing coordinates
+lat_longs %>% saveRDS("data/ohio/stop_coordinates.RDS")
+```
+
 
