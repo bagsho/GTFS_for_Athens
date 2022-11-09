@@ -1,0 +1,53 @@
+---
+title: "GTFS Creation for GoBus Service in OHIO"
+author: "Orhan Aktas"
+date: '2022-11-02'
+output:   
+    html_document:
+      toc: yes
+      number_sections: yes
+      toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  class.source = "bg-warning text-warning"
+)
+```
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(tidytransit)
+library(jsonlite)
+library(printr)
+library(hms)
+library(lubridate)
+library(readxl)
+source("functions.R")
+```
+
+# Introduction
+
+In this document, a validated, frequency-based GTFS feed for Athens, Ohio is created from the current informal transit network files. The final output GTFS feed includes the following files that have the required fields.
+
+-   agency.txt
+
+-   stops.txt
+
+-   routes.txt
+
+-   trips.txt
+
+-   stop_times.txt
+
+-   calendar.txt
+
+-   frequencies.txt
+
+-   shapes.txt
+
+# Import data
+
