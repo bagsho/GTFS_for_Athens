@@ -61,4 +61,74 @@ This feed is a collection of sample data files that are published by Google.
 sample_GTFS <- read_gtfs("data/sample-feed.zip")
 ```
 
+## Input File
 
+This feed was created manually at the beginning of the project.
+
+```{r import input_file, message=FALSE, warning=FALSE}
+input_stops <- read_excel("data/ohio/input_file.xlsx",sheet = "stops")
+input_routes <- read_excel("data/ohio/input_file.xlsx",sheet = "routes")
+```
+
+
+# Create GTFS feed
+
+## create agency
+
+```{r}
+final_agency<-sample_GTFS %>%
+    pluck("agency") %>%
+    slice(0) %>% 
+    add_row(agency_id="GOBUS",
+            agency_name="GoBus Intercity Bus Service",
+            agency_url="https://ridegobus.com/",
+            agency_timezone="US/Eastern"
+    )
+
+final_agency
+```
+
+## create calendar
+
+```{r calendar}
+final_calendar<-sample_GTFS %>%
+    pluck("calendar") %>%
+    slice(0) %>%
+    mutate(start_date=as.double(start_date),
+           end_date=as.double(end_date)
+    ) %>% 
+    add_row(service_id="AllDays",
+          monday=1,
+          tuesday=1,
+          wednesday=1,
+          thursday=1,
+          friday=1,
+          saturday=1,
+          sunday=1,
+          start_date=as.double(20220101),
+          end_date=as.double(20251231) 
+    )
+
+final_calendar
+```
+
+## create shapes
+
+```{r shapes}
+final_shapes <- sample_GTFS %>%
+  pluck("shapes") %>%
+  slice(0) %>%
+  select(-shape_dist_traveled)
+
+input_shapes <- input_routes |>
+mutate(shape_id = paste0(line, "_", direction)) |>
+select(shape_id, latitude, longitude, order) |> 
+mutate(order=order-1) |> 
+rename(shape_pt_lat=latitude,
+       shape_pt_lon=longitude,
+       shape_pt_sequence=order)
+
+final_shapes <- final_shapes |> bind_rows(input_shapes)
+
+final_shapes %>% view
+```
