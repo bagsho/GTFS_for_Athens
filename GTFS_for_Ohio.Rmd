@@ -61,15 +61,119 @@ This feed is a collection of sample data files that are published by Google.
 sample_GTFS <- read_gtfs("data/sample-feed.zip")
 ```
 
-## Input File
+## Stop & Route data
 
-This feed was created manually at the beginning of the project.
+The webpage links that contain the stop and route data were provided in the beginning of the project. The route data on the links are in pdf format and the address for each stop can be accessed via the hyperlinks in the <https://ridegobus.com/stops/>. An example information for one particular stop is shown below.
+
+![](data/ohio/akron_station_address.PNG){width="265"}
+
+### Scraping the stop addresses
+
+The addresses of all stops that are provided in the webpage were scraped with the codes below.
+
+Firstly, the links for stops were created.
+
+```{r eval=FALSE}
+
+# stops link
+html <- read_html("https://ridegobus.com/stops/")
+
+# get stop names
+stop_names <- html %>%
+                html_elements(".column-3 a") %>%
+                html_text2() %>%
+                as_tibble() %>% 
+                set_names("stop")
+
+# get stop links
+stop_links <- paste0(
+                "https://ridegobus.com",
+                html %>%
+                  html_elements(".column-3 a") %>%
+                  html_attr("href") %>%
+                  as.character()
+              )
+```
+
+Then, a function to get stop addresses was created.
+
+```{r eval=FALSE}
+get_address <- function(stop_link) {
+            address<-read_html(stop_link)%>% 
+            html_element(".col-xs-12 :nth-child(1) .col-10 , .col-xs-12 :nth-child(1) strong") %>%     
+            html_text2() %>% 
+            str_extract_all("(?<=\n).+(?=\n)") %>% 
+            pluck(1)
+            
+            return(address)
+}
+```
+
+Then, all the stop addresses were scraped from the webpage
+
+```{r eval=FALSE}
+stop_addresses<-stop_links %>%  
+                  map(get_address) %>% 
+                  unlist() %>% 
+                  as_tibble() %>% 
+                  set_names("address") %>% 
+                  bind_cols(stop_names) %>% 
+                  relocate(stop)
+```
+
+After getting all the addresses, they were converted to coordinates using an open-source geocoding service with **OpenStreetMap** data.
+
+```{r eval=FALSE}
+stop_addresses %>%
+  geocode(address, method = 'osm', lat = latitude , long = longitude)%>%
+  saveRDS("data/lat_longs_missing.RDS")
+```
+
+Although most of the coordinates were obtained, the coordinates of some stops couldn't be. Therefore, they were manually found from **Google Maps** one by one and added to the final stop table.
+
+```{r eval=FALSE}
+
+# read lat_longs table that has missing coordinates
+lat_longs_missing <- readRDS("data/lat_longs_missing.RDS")
+
+# import missing stops that were previously created manually.
+missing_stops <- read_excel("data/missing_stops.xlsx")
+
+# fill the empty missing values from missing stops table
+lat_longs <- lat_longs_missing %>%
+  left_join(missing_stops, by = "stop") %>%
+  mutate(
+    latitude = if_else(is.na(latitude), lat, latitude), 
+    longitude = if_else(is.na(longitude), lon, longitude)
+  ) %>%
+  select(-lat, -lon)
+
+# save lat_longs which has no missing coordinates
+lat_longs %>% saveRDS("data/stop_coordinates.RDS")
+```
+
+### Creating the route data from PDF files
+
+As stated before, the route data on the links are in pdf format. One of the tables in these links are shown below.
+
+![](data/ohio/route_web.PNG)
+
+Therefore, all the tables in these files were copied and pasted to an excel file to be imported later. Some additional information such as direction, stop order, etc. was added since they are needed during the creation of the GTFS files.
+
+### Making the stops information in line with stops data in the route information
+
+After getting the stop and route information from web, it was observed that these two information are not fully compatible with each other, i.e., the addresses of some stops are not same or close. Therefore, all the addresses and locations were checked manually once again and information for a considerable number of stops was changed. During these efforts an text based ***stop_id*** field was introduced to prevent confusion caused by stops at different addresses but with the same name. This field is also used in the GTFS files as it is. A snapshot of the resulting stop table in Excel is shown below.
+
+![](data/ohio/stops_excel_file.PNG)
+
+### Import from local file
+
+The route and stop information is put in the same excel file and it was named ***input_file.xlsx***. Now, the only file that is needed for routes and stops information, is this file. Unfortunately, this is not reproducible since the information on the webpage is not compatible with each other.The stops and routes are imported from this file to separate data frames.
 
 ```{r import input_file, message=FALSE, warning=FALSE}
 input_stops <- read_excel("data/ohio/input_file.xlsx",sheet = "stops")
 input_routes <- read_excel("data/ohio/input_file.xlsx",sheet = "routes")
 ```
-
 
 # Create GTFS feed
 
@@ -123,7 +227,6 @@ required fields for shapes.txt are the following ones.
 -   shape_pt_lon
 
 -   shape_pt_sequence
-
 
 ```{r shapes}
 
