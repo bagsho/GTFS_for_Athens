@@ -63,15 +63,17 @@ sample_GTFS <- read_gtfs("data/sample-feed.zip")
 
 ## Stop & Route data
 
-The webpage links that contain the stop and route data were provided in the beginning of the project. The route data on the links are in pdf format and the address for each stop can be accessed via the hyperlinks in the <https://ridegobus.com/stops/>. An example information for one particular stop is shown below.
-
-![](data/ohio/akron_station_address.PNG){width="265"}
+The webpage links that contain the stop and route data were provided in the beginning of the project. The route data in the hyperlinks in the route page, i.e., <https://ridegobus.com/routes/>, are in pdf format and the address for each stop can be accessed via the hyperlinks in the <https://ridegobus.com/stops/>.
 
 ### Scraping the stop addresses
 
-The addresses of all stops that are provided in the webpage were scraped with the codes below.
+An example information for one particular stop within the links stated above is shown below.
 
-Firstly, the links for stops were created.
+![](data/ohio/akron_station_address.PNG){width="265"}
+
+The following steps explains the process of scraping the addresses of all stops that are provided in the webpage.
+
+First, the links for stops were created.
 
 ```{r eval=FALSE}
 
@@ -162,7 +164,7 @@ Therefore, all the tables in these files were copied and pasted to an excel file
 
 ### Making the stops information in line with stops data in the route information
 
-After getting the stop and route information from web, it was observed that these two information are not fully compatible with each other, i.e., the addresses of some stops are not same or close. Therefore, all the addresses and locations were checked manually once again and information for a considerable number of stops was changed. During these efforts an text based ***stop_id*** field was introduced to prevent confusion caused by stops at different addresses but with the same name. This field is also used in the GTFS files as it is. A snapshot of the resulting stop table in Excel is shown below.
+After getting the stop and route information from web, it was observed that these two information are not fully compatible with each other, i.e., the addresses of some stops in two documents are not same or close. Therefore, all the addresses and locations were checked manually once again and information for a considerable number of stops was changed. During these efforts, an text based ***stop_id*** field was introduced to prevent confusion caused by stops at different addresses but with the same name. This field is also used in the GTFS files as it is. A snapshot of the resulting stop table in Excel is shown below.
 
 ![](data/ohio/stops_excel_file.PNG)
 
@@ -183,7 +185,7 @@ input_routes <- read_excel("data/ohio/input_file.xlsx",sheet = "routes")
 final_agency<-sample_GTFS %>%
     pluck("agency") %>%
     slice(0) %>% 
-    add_row(agency_id="GOBUS",
+    add_row(agency_id="GoBus",
             agency_name="GoBus Intercity Bus Service",
             agency_url="https://ridegobus.com/",
             agency_timezone="US/Eastern"
@@ -266,4 +268,58 @@ final_stops<-input_stops %>%
 
 final_stops %>% head()
 
+```
+
+## create routes
+
+the fields that are included in the shapes.txt are the following ones.
+
+-   route_id
+
+-   agency_id
+
+-   route_short_name
+
+-   route_long_name
+
+-   route_type
+
+```{r}
+
+final_routes <- sample_GTFS |>
+    pluck("routes") |>
+    slice(0) |>
+    select(
+      route_id,
+      agency_id,
+      route_short_name,
+      route_long_name,
+      route_type
+    )  |>
+    add_row(
+      route_id = "Route A",
+      route_long_name = "Columbus // Athens // Marietta"
+    )  |>
+    add_row(
+      route_id = "Route B",
+      route_long_name = "Cincinnati // Athens"
+    )  |>
+    add_row(
+      route_id = "Route C",
+      route_long_name = "Cleveland // Marietta // Athens"
+    )  |>
+    add_row(
+      route_id = "Route D",
+      route_long_name = "Wooster // Columbus"
+    )  |>
+    add_row(
+      route_id = "Route E",
+      route_long_name = "Van Wert // Columbus"
+    )  |>
+    mutate(agency_id="GoBus",
+           route_short_name=str_sub(route_id,start=-1),
+           route_type = 3
+    )
+
+final_routes
 ```
