@@ -1,5 +1,5 @@
 ---
-title: "GTFS Creation for GoBus Service in OHIO"
+title: "GTFS Creation for the GoBus Service in OHIO"
 author: "Orhan Aktas"
 date: '2022-11-13'
 output:   
@@ -26,14 +26,13 @@ library(printr)
 library(hms)
 library(lubridate)
 library(readxl)
-source("functions.R")
 library(rvest)
 library(tidygeocoder)
 ```
 
 # Introduction
 
-In this document, a validated, frequency-based GTFS feed for Athens, Ohio is created from the current informal transit network files. The final output GTFS feed includes the following files that have the required fields.
+In this document, a validated, frequency-based GTFS feed for the GoBus Service in OHIO is created from the current informal transit network files. The final output GTFS feed includes the following files that have the required fields.
 
 -   agency.txt
 
@@ -63,7 +62,7 @@ sample_GTFS <- read_gtfs("data/sample-feed.zip")
 
 ## Stop & Route data
 
-The webpage links that contain the stop and route data were provided in the beginning of the project. The route data in the hyperlinks in the route page, i.e., <https://ridegobus.com/routes/>, are in pdf format and the address for each stop can be accessed via the hyperlinks in the <https://ridegobus.com/stops/>.
+The webpage links that contain the stop and route data (including the schedules) were provided in the beginning of the project. The route data in the hyperlinks in the route page, i.e., <https://ridegobus.com/routes/>, are in pdf format and the address for each stop can be accessed via the hyperlinks in the <https://ridegobus.com/stops/>.
 
 ### Scraping the stop addresses
 
@@ -175,6 +174,7 @@ The route and stop information is put in the same excel file and it was named **
 ```{r import input_file, message=FALSE, warning=FALSE}
 input_stops <- read_excel("data/ohio/input_file.xlsx",sheet = "stops")
 input_routes <- read_excel("data/ohio/input_file.xlsx",sheet = "routes")
+input_schedules <- read_excel("data/ohio/input_file.xlsx",sheet = "schedules")
 ```
 
 # Create GTFS feed
@@ -323,3 +323,63 @@ final_routes <- sample_GTFS |>
 
 final_routes
 ```
+
+## create stop_times
+
+Since the stop times information is in links that contains route data, the timetables were initially transferred to the schedule sheet of the input excel file manually. In the import data section this information is already imported. In this section, this data is manipulated to get the final output. The fields that are included in the stop_times.txt are the following ones.
+
+-   trip_id
+
+-   arrival_time
+
+-   departure_time
+
+-   stop_id
+
+-   stop_sequence
+
+```{r}
+final_stop_times<-input_schedules |> 
+                      mutate(arrival_time=as_hms(arrival_time),
+                             stop_sequence=order-1,
+                             departure_time=arrival_time,
+                             stop_id=`stop name`
+                      ) |> 
+                      select(trip_id,
+                             arrival_time,
+                             departure_time,
+                             stop_id,
+                             stop_sequence
+                      )
+
+final_stop_times |> head()
+```
+
+## create trips
+
+The fields that are included in the trips.txt are the following ones.
+
+
+-   route_id
+-   trip_id
+-   service_id
+-   shape_id
+
+```{r}
+final_trips <-  input_schedules |> 
+  group_by(trip_id) |> 
+  slice(1) |> 
+  ungroup() |> 
+  mutate(shape_id=paste(line,direction,sep="_"),
+         route_id=paste("Route",toupper(line),sep=" "),
+         service_id="AllDays"
+  ) |> 
+  select(route_id,
+         trip_id,
+         service_id,
+         shape_id
+  )
+
+final_trips
+```
+
