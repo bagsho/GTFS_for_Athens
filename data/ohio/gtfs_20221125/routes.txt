@@ -1,0 +1,6 @@
+route_id,agency_id,route_short_name,route_long_name,route_type
+Route A,GoBus,A,Columbus // Athens // Marietta,3
+Route B,GoBus,B,Cincinnati // Athens,3
+Route C,GoBus,C,Cleveland // Marietta // Athens,3
+Route D,GoBus,D,Wooster // Columbus,3
+Route E,GoBus,E,Van Wert // Columbus,3

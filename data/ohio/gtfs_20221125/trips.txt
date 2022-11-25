@@ -1,0 +1,21 @@
+route_id,trip_id,service_id,shape_id,trip_headsign
+Route A,374,AllDays,a_westbound,westbound
+Route A,376,AllDays,a_westbound,westbound
+Route A,378,AllDays,a_westbound,westbound
+Route A,377,AllDays,a_eastbound,eastbound
+Route A,379,AllDays,a_eastbound,eastbound
+Route A,381,AllDays,a_eastbound,eastbound
+Route B,57,AllDays,b_westbound,westbound
+Route B,59,AllDays,b_westbound,westbound
+Route B,56,AllDays,b_eastbound,eastbound
+Route B,58,AllDays,b_eastbound,eastbound
+Route C,380,AllDays,c_southbound,southbound
+Route C,382,AllDays,c_southbound,southbound
+Route C,383,AllDays,c_northbound,northbound
+Route C,385,AllDays,c_northbound,northbound
+Route D,379D,AllDays,d_southbound,southbound
+Route D,61,AllDays,d_southbound,southbound
+Route D,374D,AllDays,d_northbound,northbound
+Route D,60,AllDays,d_northbound,northbound
+Route E,350,AllDays,e_southbound,southbound
+Route E,353,AllDays,e_northbound,northbound

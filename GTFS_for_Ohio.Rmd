@@ -364,6 +364,7 @@ The fields that are included in the trips.txt are the following ones.
 -   trip_id
 -   service_id
 -   shape_id
+-   trip_headsign
 
 ```{r}
 final_trips <-  input_schedules |> 
@@ -372,14 +373,32 @@ final_trips <-  input_schedules |>
   ungroup() |> 
   mutate(shape_id=paste(line,direction,sep="_"),
          route_id=paste("Route",toupper(line),sep=" "),
-         service_id="AllDays"
+         service_id="AllDays",
+         trip_headsign=direction
   ) |> 
   select(route_id,
          trip_id,
          service_id,
-         shape_id
-  )
+         shape_id,
+         trip_headsign
+  ) |> 
+  arrange(route_id,desc(trip_headsign))
 
 final_trips
 ```
 
+# Export GTFS files
+
+write files
+
+```{r final export, message=FALSE, warning=FALSE}
+
+write_csv(final_agency,"data/ohio/gtfs_20221125/agency.txt")
+write_csv(final_calendar,"data/ohio/gtfs_20221125/calendar.txt")
+write_csv(final_routes,"data/ohio/gtfs_20221125/routes.txt")
+write_csv(final_shapes,"data/ohio/gtfs_20221125/shapes.txt")
+write_csv(final_stops,"data/ohio/gtfs_20221125/stops.txt")
+write_csv(final_stop_times,"data/ohio/gtfs_20221125/stop_times.txt")
+write_csv(final_trips,"data/ohio/gtfs_20221125/trips.txt")
+
+```
